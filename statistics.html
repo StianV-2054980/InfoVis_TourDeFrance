@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style/navbar.css">
     <link rel="stylesheet" href="style/sidebar.css">
+    <link rel="stylesheet" href="style/data.css">
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
   </head>
   <body>
@@ -48,17 +49,21 @@
         </div>
     </nav>
     <div class="container-fluid">
-        <div class="col-md-3 col-lg-2 sidebar">
+        <div class="col-lg-2 sidebar">
             <h2>Sidebar</h2>
             <p>Information about something...</p>
             <p>More information...</p>
             <p>Additional details...</p>
             <!-- Add more content as needed -->
         </div>
-        <div class="col-md-9 col-lg-10 main-content">
-            <div class="row">
-                <div class="col-md-6">
+        <div class="col-xxl-10 main-content">
+            <div class="row justify-content-around">
+                <div class="col-xxl-6 card">
                     <div id="distance-chart">
+                    </div> 
+                </div>
+                <div class="col-xxl-6 card">
+                    <div id="speed-chart">
                     </div>
                 </div>
             </div>
