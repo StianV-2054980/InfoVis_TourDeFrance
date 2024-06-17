@@ -74,7 +74,7 @@ function createDistanceChart(data) {
             showarrow: false
         }, {
             x: 1942,
-            y: 0.5,
+            y: 0.45,
             xref: 'x',
             yref: 'paper',
             text: 'World War II',
@@ -87,6 +87,10 @@ function createDistanceChart(data) {
         y: Object.values(yearKmMap),
         mode: 'lines',
         name: '',
+        line: {
+            color: 'black',
+            width: 2
+        },
         hovertemplate: "<b>Year</b>: %{x}<br><b>Distance</b>: %{y} km",
     };
     
@@ -149,7 +153,7 @@ function createSpeedChart(data) {
             showarrow: false
         }, {
             x: 1942,
-            y: 0.5,
+            y: 0.75,
             xref: 'x',
             yref: 'paper',
             text: 'World War II',
@@ -162,6 +166,10 @@ function createSpeedChart(data) {
         y: Object.values(yearSpeedMap),
         mode: 'lines',
         name: '',
+        line: {
+            color: 'black',
+            width: 2
+        },
         hovertemplate: "<b>Year</b>: %{x}<br><b>Winning speed</b>: %{y} km/h",
     };
     
