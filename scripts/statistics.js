@@ -1,6 +1,7 @@
 // Path to your CSV file
 const csvFilePathTours = '../data/tdf_tours.csv';
 const csvFilePathWinners = '../data/tdf_winners.csv';
+const csvFilePathStages = '../data/tdf_stages.csv';
 
 // Function to fetch and parse CSV file
 async function fetchAndParseCSV(csvFilePath) {
@@ -176,11 +177,151 @@ function createSpeedChart(data) {
     Plotly.newPlot('speed-chart', [trace], layout);
 }
 
+function createStagesChart(data) {
+    const stageTypes = ['Flat stage', 'Mountain stage', 'Hilly stage', 'Team time trial', 'Individual time trial', 'Unknown'];
+    const stageCount = {};
+
+    data.forEach(row => {
+        const year = row['Year'];
+        let stageType = row['Type'];
+
+        // Check if stageType is defined
+        if (!stageType) {
+            return;
+        }
+
+        // Categorize Mountain time trial with Individual time trial
+        if (stageType === 'Mountain time trial') {
+            stageType = 'Individual time trial';
+        }
+        // Categorize Plain stage with cobblestones with Flat stage
+        else if (stageType === 'Plain stage with cobblestones' || stageType === 'Flat cobblestone stage') {
+            stageType = 'Flat stage';
+        }
+        // Rename Plain stage to Flat stage
+        else if (stageType === 'Plain stage' || stageType === 'Flat' || stageType === 'Flat Stage') {
+            stageType = 'Flat stage';
+        }
+        // Categorize Medium-mountain stage with Hilly stage
+        else if (stageType === 'Hilly Stage' || stageType === 'Medium-mountain stage' || stageType === 'Medium mountain stage') {
+            stageType = 'Hilly stage';
+        }
+        // Rename Stage with mountain(s) to Mountain stage
+        else if (stageType === 'Stage with mountain(s)' || stageType === 'High mountain stage' || stageType === 'Mountain Stage (s)' || stageType === 'Mountain Stage' || stageType === 'Stage with mountains' || stageType === 'Stage with mountain') {
+            stageType = 'Mountain stage';
+        }
+        else if (stageType !== 'Flat stage' && stageType !== 'Mountain stage' && stageType !== 'Hilly stage' && stageType !== 'Team time trial' && stageType !== 'Individual time trial') {
+            stageType = 'Unknown';
+        }
+
+        if (!stageCount[year]) {
+            stageCount[year] = {
+                'Flat stage': 0,
+                'Mountain stage': 0,
+                'Hilly stage': 0,
+                'Team time trial': 0,
+                'Individual time trial': 0,
+                'Unknown': 0,
+                total: 0
+            };
+        }
+
+        if (stageTypes.includes(stageType)) {
+            stageCount[year][stageType]++;
+            stageCount[year].total++;
+        }
+    });    
+    
+    // Prepare colors based on CUD palette
+    const colors = {
+        'Flat stage': '#0072B2',
+        'Mountain stage': '#CC79A7',
+        'Hilly stage': '#009E73',
+        'Team time trial': '#D55E00',
+        'Individual time trial': '#E69F00',
+        'Unknown': 'grey'
+    };
+
+    // Prepare data
+    const years = Object.keys(stageCount).sort((a, b) => a - b);
+    const plotData = stageTypes.map(stageType => {
+        return {
+            x: years,
+            y: years.map(year => stageCount[year][stageType] || 0),
+            name: stageType,
+            type: 'bar',
+            marker: {
+                color: colors[stageType]
+            }
+        };
+    });
+
+    // Layout for the chart
+    const layout = {
+        title: 'Tour de France Stage Types Over Years',
+        barmode: 'stack',
+        xaxis: {
+            title: 'Year',
+            range: [1903, 2024]
+        },
+        yaxis: {
+            title: 'Number of Stages'
+        },
+        shapes: [{
+            type: 'rect',
+            xref: 'x',
+            yref: 'paper',
+            x0: 1914,
+            y0: 0,
+            x1: 1918,
+            y1: 1,
+            fillcolor: '#808080',
+            opacity: 0.2,
+            line: {
+                width: 0
+            }
+        }, {
+            type: 'rect',
+            xref: 'x',
+            yref: 'paper',
+            x0: 1939,
+            y0: 0,
+            x1: 1945,
+            y1: 1,
+            fillcolor: '#808080',
+            opacity: 0.2,
+            line: {
+                width: 0
+            }
+        }],
+        annotations: [{
+            x: 1916,
+            y: 0.5,
+            xref: 'x',
+            yref: 'paper',
+            text: 'World War I',
+            showarrow: false
+        }, {
+            x: 1942,
+            y: 0.75,
+            xref: 'x',
+            yref: 'paper',
+            text: 'World War II',
+            showarrow: false
+        }]
+    };
+
+    // Create the Plotly chart
+    Plotly.newPlot('stagetypes-chart', plotData, layout);
+}
+
 async function createCharts() {
     const tourData = await fetchAndParseCSV(csvFilePathTours);
     const winnerData = await fetchAndParseCSV(csvFilePathWinners);
+    const stageData = await fetchAndParseCSV(csvFilePathStages);
     createDistanceChart(tourData);
     createSpeedChart(winnerData);
+    createStagesChart(stageData);
 }
 
 createCharts();
