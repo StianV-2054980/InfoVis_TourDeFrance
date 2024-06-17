@@ -252,7 +252,10 @@ function createStagesChart(data) {
             type: 'bar',
             marker: {
                 color: colors[stageType]
-            }
+            },
+            customdata: years.map(year => stageCount[year].total),
+            hovertemplate: '<b>Year</b>: %{x}<br><b>Stage type</b>: ' + stageType + '<br><b>Number of stages from this stagetype</b>: %{y}<br>' + 
+                '<b>Total number of stages</b>: %{customdata}',
         };
     });
 
