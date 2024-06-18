@@ -8,7 +8,7 @@ window.addEventListener('resize', function() {
 
 function adjustSidebarHeight() {
     var navbarHeight = document.getElementById('main-navbar').offsetHeight;
-    var windowHeight = window.innerHeight;
+    var windowHeight = document.getElementById('main-content').offsetHeight;
     var sidebar = document.querySelector('.sidebar');
     sidebar.style.height = (windowHeight - navbarHeight) + 'px';
 }
