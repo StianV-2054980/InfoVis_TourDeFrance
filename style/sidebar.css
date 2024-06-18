@@ -27,6 +27,10 @@
     border-right: 4px solid #ffc425;
 }
 
+.slidecontainer .slider {
+    width: 100%;
+}
+
 .main-content {
     padding: 15px;
 }
