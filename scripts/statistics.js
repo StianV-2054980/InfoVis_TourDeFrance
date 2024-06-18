@@ -431,7 +431,7 @@ function createStartvsFinishChart(data) {
         mode: 'lines',
         name: 'Starters',
         line: {
-            color: 'blue',
+            color: '#0072B2',
             width: 2
         },
         fill: 'tozeroy',
@@ -445,7 +445,7 @@ function createStartvsFinishChart(data) {
         mode: 'lines',
         name: 'Finishers',
         line: {
-            color: 'green',
+            color: '#D55E00',
             width: 2
         },
         fill: 'tozeroy',
