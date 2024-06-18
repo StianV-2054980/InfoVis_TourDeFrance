@@ -318,6 +318,109 @@ function createStagesChart(data) {
     Plotly.newPlot('stagetypes-chart', plotData, layout);
 }
 
+function createStartvsFinishChart(data) {
+    const yearStartersMap = {};
+    const yearFinishersMap = {};
+
+    data.forEach(row => {
+        const year = row['Year'];
+        const starters = row['Starters'];
+        const finishers = row['Finishers'];
+
+        if (year && starters && finishers) {
+            const starterCount = parseInt(starters, 10);
+            const finisherCount = parseInt(finishers, 10);
+
+            if (!isNaN(starterCount) && !isNaN(finisherCount)) {
+                yearStartersMap[year] = starterCount;
+                yearFinishersMap[year] = finisherCount;
+            }
+        }
+    });
+
+    var layout = {
+        title: 'Tour de France Starters and Finishers by Year',
+        xaxis: {
+            range: [Math.min(...Object.keys(yearStartersMap)), Math.max(...Object.keys(yearStartersMap))]
+        },
+        yaxis: {
+            title: 'Number of Riders'
+        },
+        shapes: [{
+            type: 'rect',
+            xref: 'x',
+            yref: 'paper',
+            x0: 1914,
+            y0: 0,
+            x1: 1918,
+            y1: 1,
+            fillcolor: '#808080',
+            opacity: 0.2,
+            line: {
+                width: 0
+            }
+        }, {
+            type: 'rect',
+            xref: 'x',
+            yref: 'paper',
+            x0: 1939,
+            y0: 0,
+            x1: 1945,
+            y1: 1,
+            fillcolor: '#808080',
+            opacity: 0.2,
+            line: {
+                width: 0
+            }
+        }],
+        annotations: [{
+            x: 1916,
+            y: 0.75,
+            xref: 'x',
+            yref: 'paper',
+            text: 'World War I',
+            showarrow: false
+        }, {
+            x: 1942,
+            y: 0.75,
+            xref: 'x',
+            yref: 'paper',
+            text: 'World War II',
+            showarrow: false
+        }]
+    };
+
+    var traceStarters = {
+        x: Object.keys(yearStartersMap),
+        y: Object.values(yearStartersMap),
+        mode: 'lines',
+        name: 'Starters',
+        line: {
+            color: 'blue',
+            width: 2
+        },
+        fill: 'tozeroy',
+        fillcolor: 'rgba(0, 0, 255, 0.2)',
+        hovertemplate: "<b>Year</b>: %{x}<br><b>Starters</b>: %{y}"
+    };
+
+    var traceFinishers = {
+        x: Object.keys(yearFinishersMap),
+        y: Object.values(yearFinishersMap),
+        mode: 'lines',
+        name: 'Finishers',
+        line: {
+            color: 'green',
+            width: 2
+        },
+        fill: 'tozeroy',
+        fillcolor: 'rgba(0, 128, 0, 0.2)',
+        hovertemplate: "<b>Year</b>: %{x}<br><b>Finishers</b>: %{y}"
+    };
+
+    Plotly.newPlot('starterfinisher-chart', [traceStarters, traceFinishers], layout);
+}
+
 async function createCharts() {
     const tourData = await fetchAndParseCSV(csvFilePathTours);
     const winnerData = await fetchAndParseCSV(csvFilePathWinners);
@@ -325,6 +428,9 @@ async function createCharts() {
     createDistanceChart(tourData);
     createSpeedChart(winnerData);
     createStagesChart(stageData);
+    createStartvsFinishChart(tourData);
 }
+
+// TODO: On hover in 1 chart, highlight the same year in the other charts
 
 createCharts();
