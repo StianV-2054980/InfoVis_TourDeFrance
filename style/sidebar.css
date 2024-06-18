@@ -1,3 +1,25 @@
+#openSidebar {
+    position: fixed;
+    left: 0;
+    top: 50%;
+    width: auto;
+    height: auto;
+    padding: 10px;
+    background-color: #ffc425;
+    border: none;
+    outline: none;
+    color: white;
+    cursor: pointer;
+    z-index: 1001;
+    opacity: 0.5;
+    transition: 0.3s;
+}
+
+#openSidebar:hover {
+    opacity: 1;
+    transition: 0.3s;
+}
+
 .sidebar {
     background-color: #e8dfc2;
     padding: 15px;
@@ -11,7 +33,7 @@
 
 .container-fluid {
     display: flex;
-    padding-left: 0;
+    padding-left: 3;
     padding-right: 0;
 }
 
