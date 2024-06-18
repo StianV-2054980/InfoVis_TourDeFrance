@@ -3,6 +3,11 @@ const csvFilePathTours = '../data/tdf_tours.csv';
 const csvFilePathWinners = '../data/tdf_winners.csv';
 const csvFilePathStages = '../data/tdf_stages.csv';
 
+var yearIndexMapDistance = {};
+var yearIndexMapSpeed = {};
+var yearIndexMapStages = {};
+var yearIndexMapStartersFinishers = {};
+
 // Function to fetch and parse CSV file
 async function fetchAndParseCSV(csvFilePath) {
     const response = await fetch(csvFilePath);
@@ -92,10 +97,20 @@ function createDistanceChart(data) {
             color: 'black',
             width: 2
         },
+        hoverinfo: 'none',
         hovertemplate: "<b>Year</b>: %{x}<br><b>Distance</b>: %{y} km",
     };
     
     Plotly.newPlot('distance-chart', [trace], layout);
+
+     Object.keys(yearKmMap).forEach((year, index) => {
+        yearIndexMapDistance[year] = index;
+     });
+
+     document.getElementById('distance-chart').on('plotly_hover', function(data) {
+        var year = data.points[0].x;
+        highlightYear(year);
+     });
 }
 
 function createSpeedChart(data) {
@@ -171,10 +186,20 @@ function createSpeedChart(data) {
             color: 'black',
             width: 2
         },
+        hoverinfo: 'none',
         hovertemplate: "<b>Year</b>: %{x}<br><b>Winning speed</b>: %{y} km/h",
     };
     
     Plotly.newPlot('speed-chart', [trace], layout);
+
+    Object.keys(yearSpeedMap).forEach((year, index) => {
+        yearIndexMapSpeed[year] = index;
+    });
+
+    document.getElementById('speed-chart').on('plotly_hover', function(data) {
+        var year = data.points[0].x;
+        highlightYear(year);
+    });
 }
 
 function createStagesChart(data) {
@@ -316,6 +341,16 @@ function createStagesChart(data) {
 
     // Create the Plotly chart
     Plotly.newPlot('stagetypes-chart', plotData, layout);
+
+    Object.keys(stageCount).forEach((year, index) => {
+        yearIndexMapStages[year] = index;
+    });
+
+    document.getElementById('stagetypes-chart').on('plotly_hover', function(data) {
+        var year = data.points[0].x;
+        var curveNumber = data.points[0].curveNumber;
+        highlightYear(year, curveNumber);
+    });
 }
 
 function createStartvsFinishChart(data) {
@@ -419,6 +454,60 @@ function createStartvsFinishChart(data) {
     };
 
     Plotly.newPlot('starterfinisher-chart', [traceStarters, traceFinishers], layout);
+
+    Object.keys(yearStartersMap).forEach((year, index) => {
+        yearIndexMapStartersFinishers[year] = index;
+    });
+
+    document.getElementById('starterfinisher-chart').on('plotly_hover', function(data) {
+        var year = data.points[0].x;
+        highlightYear(year);
+    });
+}
+
+function highlightYear(year, curveNumber) {
+    var indexDistance = yearIndexMapDistance[year];
+    var indexSpeed = yearIndexMapSpeed[year];
+    var indexStages = yearIndexMapStages[year];
+    var indexStartFinish = yearIndexMapStartersFinishers[year];
+
+    if (indexDistance !== undefined) {
+        Plotly.Fx.hover('distance-chart', [{
+            curveNumber: 0,
+            pointNumber: indexDistance
+        }]);
+    }
+
+    if (indexSpeed !== undefined) {
+        Plotly.Fx.hover('speed-chart', [{
+            curveNumber: 0,
+            pointNumber: indexSpeed
+        }]);
+    }
+
+    if (indexStages !== undefined) {
+        Plotly.Fx.hover('stagetypes-chart', [{
+            curveNumber: curveNumber === undefined ? 0 : curveNumber,
+            pointNumber: indexStages
+        }]);
+    }
+
+    if (indexStartFinish !== undefined) {
+        Plotly.Fx.hover('starterfinisher-chart', [{
+            curveNumber: 0,
+            pointNumber: indexStartFinish
+        }, {
+            curveNumber: 1,
+            pointNumber: indexStartFinish
+        }]);
+    }
+}
+
+function unhighlightAll() {
+    Plotly.Fx.unhover('distance-chart');
+    Plotly.Fx.unhover('speed-chart');
+    Plotly.Fx.unhover('stagetypes-chart');
+    Plotly.Fx.unhover('starterfinisher-chart');
 }
 
 async function createCharts() {
@@ -430,7 +519,5 @@ async function createCharts() {
     createStagesChart(stageData);
     createStartvsFinishChart(tourData);
 }
-
-// TODO: On hover in 1 chart, highlight the same year in the other charts
 
 createCharts();
