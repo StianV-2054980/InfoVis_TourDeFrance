@@ -76,14 +76,14 @@ function createDistanceChart(data) {
             y: 0.5,
             xref: 'x',
             yref: 'paper',
-            text: 'World War I',
+            text: 'World War I - No race',
             showarrow: false
         }, {
             x: 1942,
             y: 0.45,
             xref: 'x',
             yref: 'paper',
-            text: 'World War II',
+            text: 'World War II - No race',
             showarrow: false
         }]
     };
@@ -165,14 +165,14 @@ function createSpeedChart(data) {
             y: 0.5,
             xref: 'x',
             yref: 'paper',
-            text: 'World War I',
+            text: 'World War I - No race',
             showarrow: false
         }, {
             x: 1942,
             y: 0.75,
             xref: 'x',
             yref: 'paper',
-            text: 'World War II',
+            text: 'World War II - No race',
             showarrow: false
         }]
     };
@@ -327,14 +327,14 @@ function createStagesChart(data) {
             y: 0.5,
             xref: 'x',
             yref: 'paper',
-            text: 'World War I',
+            text: 'World War I - No race',
             showarrow: false
         }, {
             x: 1942,
             y: 0.75,
             xref: 'x',
             yref: 'paper',
-            text: 'World War II',
+            text: 'World War II - No race',
             showarrow: false
         }]
     };
@@ -413,14 +413,14 @@ function createStartvsFinishChart(data) {
             y: 0.75,
             xref: 'x',
             yref: 'paper',
-            text: 'World War I',
+            text: 'World War I - No race',
             showarrow: false
         }, {
             x: 1942,
             y: 0.75,
             xref: 'x',
             yref: 'paper',
-            text: 'World War II',
+            text: 'World War II - No race',
             showarrow: false
         }]
     };
