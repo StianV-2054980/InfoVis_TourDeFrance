@@ -1,4 +1,4 @@
-// Path to your CSV file
+// Path to CSV file
 const csvFilePathTours = '../data/tdf_tours.csv';
 const csvFilePathWinners = '../data/tdf_winners.csv';
 const csvFilePathStages = '../data/tdf_stages.csv';
