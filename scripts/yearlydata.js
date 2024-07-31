@@ -1,6 +1,13 @@
-// Path to CSV file
-var csvFilePathWinners = '../data/tdf_winners.csv';
-var csvFilePathTours = '../data/tdf_tours.csv';
+// // Path to CSV file
+// var csvFilePathWinners = '../data/tdf_winners.csv';
+// var csvFilePathTours = '../data/tdf_tours.csv';
+
+// Determine the base URL
+var baseURL = window.location.hostname === 'localhost' ? '' : '/InfoVis_TourDeFrance';
+
+// Construct the full URLs
+var csvFilePathWinners = baseURL + '/data/tdf_winners.csv';
+var csvFilePathTours = baseURL + '/data/tdf_tours.csv';
 
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
