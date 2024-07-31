@@ -1,7 +1,3 @@
-// // Path to CSV file
-// var csvFilePathWinners = '../data/tdf_winners.csv';
-// var csvFilePathTours = '../data/tdf_tours.csv';
-
 // Determine the base URL
 var baseURL = window.location.hostname === 'localhost' ? '' : '/InfoVis_TourDeFrance';
 

@@ -1,7 +1,10 @@
+// Determine the base URL
+var baseURL = window.location.hostname === 'localhost' ? '' : '/InfoVis_TourDeFrance';
+
 // Path to CSV file
-const csvFilePathTours = '../data/tdf_tours.csv';
-const csvFilePathWinners = '../data/tdf_winners.csv';
-const csvFilePathStages = '../data/tdf_stages.csv';
+const csvFilePathTours = baseURL + '/data/tdf_tours.csv';
+const csvFilePathWinners = baseURL + '/data/tdf_winners.csv';
+const csvFilePathStages = baseURL + '/data/tdf_stages.csv';
 
 var yearIndexMapDistance = {};
 var yearIndexMapSpeed = {};
