@@ -161,6 +161,19 @@ function createSpeedChart(data) {
             line: {
                 width: 0
             }
+        }, {
+            type: 'rect',
+            xref: 'x',
+            yref: 'paper',
+            x0: 1999,
+            y0: 0,
+            x1: 2005,
+            y1: 1,
+            fillcolor: '#808080',
+            opacity: 0.2,
+            line: {
+                width: 0
+            }
         }],
         annotations: [{
             x: 1916,
@@ -176,6 +189,14 @@ function createSpeedChart(data) {
             yref: 'paper',
             text: 'World War II - No race',
             showarrow: false
+        }, {
+            x: 2002,
+            y: 0.5,
+            xref: 'x',
+            yref: 'paper',
+            text: 'Doping scandal - No winner<br>No official speed',
+            showarrow: false,
+            align: 'center'
         }]
     };
     
@@ -332,8 +353,8 @@ function createStagesChart(data) {
             text: 'World War I - No race',
             showarrow: false
         }, {
-            x: 1942,
-            y: 0.75,
+            x: 1944,
+            y: 0.95,
             xref: 'x',
             yref: 'paper',
             text: 'World War II - No race',
