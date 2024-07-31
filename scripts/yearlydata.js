@@ -17,10 +17,53 @@ async function fetchAndParseCSV(csvFilePath) {
     });
 }
 
+// Mapping of country names to flag-icon-css classes
+const countryFlagMap = {
+    'France': 'fr',
+    'Luxembourg': 'lu',
+    'Belgium': 'be',
+    'Denmark': 'dk',
+    'Switzerland': 'ch',
+    'Italy': 'it',
+    'Netherlands': 'nl',
+    'Spain': 'es',
+    'Ireland': 'ie',
+    'United States': 'us',
+    'Australia': 'au',
+    'Germany': 'de',
+    'United Kingdom': 'gb',
+    'Great Britain': 'gb',
+    'Ukraine': 'ua',
+    'Colombia': 'co',
+    'Slovenia': 'si',
+    'Ecuador': 'ec',
+    'Slovakia': 'sk',
+    'Norway': 'no',
+    'Luxembourg': 'lu',
+    'Russia': 'ru',
+    'Sweden': 'se',
+    'Portugal': 'pt',
+    'Czech Republic': 'cz',
+    'Kazakhstan': 'kz',
+    'Austria': 'at',
+    'New Zealand': 'nz',
+    'South Africa': 'za',
+    'Poland': 'pl',
+    'Canada': 'ca',
+    'Estonia': 'ee',
+    'Latvia': 'lv',
+    'Lithuania': 'lt',
+    'USA': 'us',
+};
+
+function getFlag(country) {
+    var flagClass = countryFlagMap[country] || '';
+    return '<span class="fi fi-' + flagClass + '"></span>';
+}
+
 // Cleans distance format
 function cleanDistance(distance) {
     if (!distance) return 'N/A';
-
     return distance.split('(')[0].trim();
 }
 
@@ -29,8 +72,17 @@ function updateInfo(year, tourData, winnerData) {
     const winnerInfo = winnerData.find(row => row.Year == year) || {};
     const tourInfo = tourData.find(row => row.Year == year) || {};
 
+    let winnerText = winnerInfo.Rider || 'N/A';
+    let flagIcon = getFlag(winnerInfo.Country);
+
+    // Special case for years 1998 to 2006
+    if (year > 1998 && year < 2006) {
+        winnerText = '<s>Lance Armstrong</s>';
+        flagIcon = getFlag('USA');
+    }
+
     document.getElementById('year').textContent = year;
-    document.getElementById('winner').textContent = winnerInfo.Rider || 'N/A';
+    document.getElementById('winner').innerHTML = `${winnerText} ${flagIcon}` || 'N/A';
     document.getElementById('time').textContent = winnerInfo.Time || 'N/A';
     document.getElementById('distance').textContent = cleanDistance(tourInfo.Distance);
     document.getElementById('stages').textContent = tourInfo.Stages || 'N/A';
