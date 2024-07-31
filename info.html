@@ -52,11 +52,59 @@
         </div>
     </nav>
     <div class="container-fluid">
-        <div class="col-md-12 main-content">
-            <h1>Main Content</h1>
-            <p>This is the main content area. It will be to the right of the sidebar.</p>
-            <p>Scroll down to see how the sidebar stays in place.</p>
-            <!-- Add more content as needed -->
+        <div class="col-md-12 main-content position-relative">
+            <div class="row justify-content-around">
+                <div class="col-md-5 card p-3">
+                    <i class="fa-solid fa-bicycle fa-2x"></i>
+                    <p class="mt-2">
+                        The Tour de France is one of the most prestigious and challenging bicycle races in the world. 
+                        It is held annually, primarily in <strong>France</strong>, although it occasionally passes through neighboring countries. 
+                        The race typically lasts for <strong>21 days</strong> (including 2 rest days), covering approximately <strong>3500 kilometers</strong> and consisting of various stages. 
+                        Riders compete not only for individual stage victories but also for the overall win, known as the General Classification (GC).
+                        The overall win is determined by the rider with the lowest cumulative time over all stages.
+                        Next to the overall win, there are also other classifications explained below. Each with their own jersey.
+                    </p>
+                    <i class="fa-solid fa-tshirt fa-2x mt-2" style="color:yellow; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;"></i>
+                    <p><strong>Yellow Jersey (Maillot Jaune):</strong> Awarded to the rider with the lowest overall time, making them the race leader.</p>
+                    <i class="fa-solid fa-tshirt fa-2x mt-2" style="color:green; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;"></i>
+                    <p><strong>Green Jersey (Maillot Vert):</strong> Given to the leader of the points classification, which rewards sprinters who accumulate points by finishing in the top positions of stages and intermediate sprints.</p>
+                    <i class="fa-solid fa-tshirt fa-2x mt-2" style="color:white; text-shadow: -2px 0 black, 0 2px black, 2px 0 black, 0 -2px black;"></i>
+                    <p><strong>White Jersey (Maillot Blanc):</strong> Awarded to the best young rider (under 26) in the General Classification.</p>
+                    <svg width="50" height="40">
+                        <defs>
+                            <pattern id="polka-dots" patternUnits="userSpaceOnUse" width="52" height="52">
+                                <image href="attributes/polkadot.png" x="0" y="0" width="52" height="52"/>
+                            </pattern>
+                        </defs>
+                        <text x="1" y="35" style="font-family: FontAwesome; font-size: 34px; fill: url(#polka-dots); stroke: black; stroke-width: 2px;">
+                            &#xf553;
+                        </text>
+                    </svg>
+                    <p><strong>Polka Dot Jersey (Maillot à Pois Rouges):</strong> Worn by the best climber, who earns points by reaching mountain summits before other riders.</p>
+                </div>
+                <div class="col-md-5 card p-3">
+                    <i class="fa-solid fa-trophy fa-2x"></i>
+                    <p class="mt-2">
+                        The Tour de France has seen many legendary cyclists who have achieved great success. Here are some of the most famous winners:
+                        <br><br>
+                        <strong>Eddy Merckx (Belgium):</strong> Known as "The Cannibal," Merckx won the Tour de France five times (1969, 1970, 1971, 1972, 1974). He is often considered one of the greatest cyclists of all time.
+                        <br><br>
+                        <strong>Jacques Anquetil (France):</strong> Anquetil was the first rider to win the Tour de France five times (1957, 1961, 1962, 1963, 1964). He was known for his time-trialing prowess.
+                        <br><br>
+                        <strong>Bernard Hinault (France):</strong> Nicknamed "The Badger," Hinault also won the Tour de France five times (1978, 1979, 1981, 1982, 1985). He is the last Frenchman to have won the race.
+                        <br><br>
+                        <strong>Miguel Indurain (Spain):</strong> Indurain won the Tour de France five consecutive times (1991-1995), a feat only matched by Lance Armstrong, whose seven titles (1999-2005) were later stripped due to doping violations.
+                        <br><br>
+                        <strong>Chris Froome (Great Britain):</strong> Froome has won the Tour de France four times (2013, 2015, 2016, 2017), making him one of the most successful modern riders in the race.
+                        <br><br>
+                        <strong>Tadej Pogačar (Slovenia):</strong> Pogačar has emerged as a dominant force in recent years, winning the Tour de France thrice (2020, 2021, 2024) at a young age.
+                    </p>
+                    <i class="fa-solid fa-comment-dots fa-2x mt-2"></i>
+                    <p>
+                        For more information about the Tour de France, visit the official website <a class="link-underline-primary" href="https://www.letour.fr/en/">here</a>.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
