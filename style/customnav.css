@@ -1,0 +1,30 @@
+.custom-nav {
+    list-style-type: none;
+    padding: 20px;
+    margin: 0;
+    border-radius: 5px;
+    background-color: #dfdfdf;
+}
+
+.custom-nav-item {
+    margin-bottom: 10px;
+}
+
+.custom-nav-link {
+    display: block;
+    padding: 10px;
+    background-color: #ffc425;
+    color: #000;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.custom-nav-link.custom-active {
+    background-color: #000;
+    color: #fff;
+}
+
+.custom-nav-link:hover {
+    background-color: #e0a800;
+    color: #fff;
+}
