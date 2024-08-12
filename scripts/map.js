@@ -16,6 +16,12 @@ var finishIcon = L.divIcon({ className: 'custom-icon', html: '<i class="fa fa-fl
 
 // Fetch coordinates of a location string
 async function fetchCoordinates(location) {
+    // Check if location is in sessionStorage
+    const cachedLocation = sessionStorage.getItem(location);
+    if (cachedLocation) {
+        return JSON.parse(cachedLocation);
+    }
+
     var response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
     const data = await response.json();
     if(data.length === 0) {
@@ -23,11 +29,15 @@ async function fetchCoordinates(location) {
         const country = location.match(/\(([^)]+)\)/)[1];
         response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(country)}`);
     }
-    return data.map(location => ({
+    const coordinates = data.map(location => ({
         name: location.display_name,
         lat: parseFloat(location.lat),
         lon: parseFloat(location.lon)
     }));
+
+    // Store in sessionStorage
+    sessionStorage.setItem(location, JSON.stringify(coordinates));
+    return coordinates;
 }
 
 function calcDistance(lat1, lon1, lat2, lon2) {
