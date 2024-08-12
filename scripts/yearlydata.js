@@ -4,6 +4,7 @@ var baseURL = window.location.hostname === 'localhost' ? '' : '/InfoVis_TourDeFr
 // Construct the full URLs
 var csvFilePathWinners = baseURL + '/data/tdf_winners.csv';
 var csvFilePathTours = baseURL + '/data/tdf_tours.csv';
+var csvFilePathStages = baseURL + '/data/tdf_stages.csv';
 
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
@@ -71,7 +72,7 @@ function cleanDistance(distance) {
 }
 
 // Function to update yearly information
-function updateInfo(year, tourData, winnerData) {
+async function updateInfo(year, tourData, winnerData, stagesData) {
     const winnerInfo = winnerData.find(row => row.Year == year) || {};
     const tourInfo = tourData.find(row => row.Year == year) || {};
 
@@ -90,12 +91,15 @@ function updateInfo(year, tourData, winnerData) {
     document.getElementById('distance').textContent = cleanDistance(tourInfo.Distance);
     document.getElementById('stages').textContent = tourInfo.Stages || 'N/A';
     document.getElementById('speed').textContent = winnerInfo['Avg Speed'] || 'N/A';
+
+    await updateMap(year, stagesData);
 }
 
 // Init page
 async function initPage() {
     const tourData = await fetchAndParseCSV(csvFilePathTours);
     const winnerData = await fetchAndParseCSV(csvFilePathWinners);
+    const stagesData = await fetchAndParseCSV(csvFilePathStages);
 
     const yearSelector = document.getElementById('yearSelector');
     const prevYearButton = document.getElementById('prevYear');
@@ -116,7 +120,7 @@ async function initPage() {
     }
 
     // Set initial year
-    updateInfo(currentYear, tourData, winnerData);
+    await updateInfo(currentYear, tourData, winnerData, stagesData);
 
     // Disable button by default
     nextYearButton.disabled = true;
@@ -124,7 +128,7 @@ async function initPage() {
     // Add event listeners
     yearSelector.addEventListener('change', function() {
         currentYear = parseInt(this.value);
-        updateInfo(currentYear, tourData, winnerData);
+        updateInfo(currentYear, tourData, winnerData, stagesData);
         nextYearButton.disabled = currentYear === maxYear;
         prevYearButton.disabled = currentYear === minYear;
     });
@@ -137,7 +141,7 @@ async function initPage() {
                 currentYear--;
             }
             yearSelector.value = currentYear;
-            updateInfo(currentYear, tourData, winnerData);
+            updateInfo(currentYear, tourData, winnerData, stagesData);
         }
         nextYearButton.disabled = false;
         prevYearButton.disabled = currentYear === minYear;
@@ -151,7 +155,7 @@ async function initPage() {
                 currentYear++;
             }
             yearSelector.value = currentYear;
-            updateInfo(currentYear, tourData, winnerData);
+            updateInfo(currentYear, tourData, winnerData, stagesData);
         }
         prevYearButton.disabled = false;
         nextYearButton.disabled = currentYear === maxYear;
