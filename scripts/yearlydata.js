@@ -195,7 +195,7 @@ async function initPage() {
     const yearSelector = document.getElementById('yearSelector');
     const prevYearButton = document.getElementById('prevYear');
     const nextYearButton = document.getElementById('nextYear');
-    let currentYear = 2004; // Last year in the dataset
+    let currentYear = 2022; // Last year in the dataset
     const minYear = 1903; // First year in the dataset
     const maxYear = 2022; // Last year in the dataset
 
