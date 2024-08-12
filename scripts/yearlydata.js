@@ -21,6 +21,45 @@ async function fetchAndParseCSV(csvFilePath) {
     });
 }
 
+// Short country names to flag-icon-css classes
+const shortCountryFlagMap = {
+    'FRA' : 'fr',
+    'SLO' : 'si',
+    'LUX' : 'lu',
+    'BEL' : 'be',
+    'DEN' : 'dk',
+    'CHE' : 'ch',
+    'ITA' : 'it',
+    'NED' : 'nl',
+    'ESP' : 'es',
+    'IRL' : 'ie',
+    'USA' : 'us',
+    'AUS' : 'au',
+    'GER' : 'de',
+    'GBR' : 'gb',
+    'GB' : 'gb',
+    'UKR' : 'ua',
+    'COL' : 'co',
+    'SVN' : 'si',
+    'ECU' : 'ec',
+    'SVK' : 'sk',
+    'NOR' : 'no',
+    'RUS' : 'ru',
+    'SWE' : 'se',
+    'PRT' : 'pt',
+    'CZE' : 'cz',
+    'KAZ' : 'kz',
+    'AUT' : 'at',
+    'NZL' : 'nz',
+    'ZAF' : 'za',
+    'POL' : 'pl',
+    'CAN' : 'ca',
+    'EST' : 'ee',
+    'LVA' : 'lv',
+    'LTU' : 'lt',
+    'SUI' : 'ch',
+};
+
 // Mapping of country names to flag-icon-css classes
 const countryFlagMap = {
     'France': 'fr',
@@ -60,7 +99,11 @@ const countryFlagMap = {
     'USA': 'us',
 };
 
-function getFlag(country) {
+function getFlag(country, short = false) {
+    if (short) {
+        var flagClass = shortCountryFlagMap[country] || '';
+        return flagClass;
+    }
     var flagClass = countryFlagMap[country] || '';
     return '<span class="fi fi-' + flagClass + '"></span>';
 }
@@ -91,8 +134,56 @@ async function updateInfo(year, tourData, winnerData, stagesData) {
     document.getElementById('distance').textContent = cleanDistance(tourInfo.Distance);
     document.getElementById('stages').textContent = tourInfo.Stages || 'N/A';
     document.getElementById('speed').textContent = winnerInfo['Avg Speed'] || 'N/A';
-
+    
+    updateStagesList(year, stagesData);
     await updateMap(year, stagesData);
+}
+
+// Update stages list
+function updateStagesList(year, stagesData) {
+    const stages = stagesData.filter(row => row.Year == year);
+    const stagesList = document.getElementById('stagesList');
+    stagesList.innerHTML = '';
+
+    for (const stage of stages) {
+        const stageItem = document.createElement('li');
+        stageItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+
+        divItem = stageItem.appendChild(document.createElement('div'));
+        divItem.classList.add('ms-2', 'me-auto');
+
+        courseItem = divItem.appendChild(document.createElement('div'));
+        courseItem.classList.add('fw-bold');
+        courseItem.textContent = stage.Course;
+
+        winnerItem = divItem.appendChild(document.createElement('div'));
+        
+        let winner = stage.Winner || 'N/A';
+        // Cut away the parentheses, and remember the country inside the parentheses
+        let country = '';
+        let isDisqualified = false;
+        if (winner.includes('(')) {
+            const parts = winner.split('(');
+            winner = parts[0].trim();
+            country = parts[1].replace(')', '');
+        }
+        if (country.includes('[a]')) {
+            country = country.replace('[a]', '').trim();
+            isDisqualified = true;
+        }
+        console.log(winner, country, isDisqualified);
+        let flagIcon = getFlag(country, true);
+
+        if (isDisqualified) {
+            scrappedItem = winnerItem.appendChild(document.createElement('s'));
+            scrappedItem.textContent = winner;
+        } else {
+            winnerItem.textContent = winner + ' ';
+        }
+        flagItem = winnerItem.appendChild(document.createElement('span'));
+        flagItem.classList.add('fi', `fi-${flagIcon}`);
+        stagesList.appendChild(stageItem);
+    }
 }
 
 // Init page
@@ -104,7 +195,7 @@ async function initPage() {
     const yearSelector = document.getElementById('yearSelector');
     const prevYearButton = document.getElementById('prevYear');
     const nextYearButton = document.getElementById('nextYear');
-    let currentYear = 2022; // Last year in the dataset
+    let currentYear = 2004; // Last year in the dataset
     const minYear = 1903; // First year in the dataset
     const maxYear = 2022; // Last year in the dataset
 

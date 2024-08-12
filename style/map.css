@@ -34,3 +34,8 @@
     color: black;
     border: 2px solid black; /* Add border for better visibility */
 }
+
+.scrollable {
+    max-height: 500px;
+    overflow-y: auto;
+}

@@ -16,7 +16,7 @@ var finishIcon = L.divIcon({ className: 'custom-icon', html: '<i class="fa fa-fl
 
 // Fetch coordinates of a location string
 async function fetchCoordinates(location) {
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
+    var response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
     const data = await response.json();
     if(data.length === 0) {
         // Try again with only the country inside the location in parentheses
