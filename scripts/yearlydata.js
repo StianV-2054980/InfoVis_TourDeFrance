@@ -58,6 +58,7 @@ const shortCountryFlagMap = {
     'LVA' : 'lv',
     'LTU' : 'lt',
     'SUI' : 'ch',
+    'IRE' : 'ie',
 };
 
 // Mapping of country names to flag-icon-css classes
@@ -154,6 +155,7 @@ function updateStagesList(year, stagesData) {
 
         courseItem = divItem.appendChild(document.createElement('div'));
         courseItem.classList.add('fw-bold');
+        stage.Course = stage.Course.replace(/\[.*?\]/g, '');
         courseItem.textContent = stage.Course;
 
         winnerItem = divItem.appendChild(document.createElement('div'));

@@ -32,7 +32,8 @@ async function fetchCoordinates(location) {
     const coordinates = data.map(location => ({
         name: location.display_name,
         lat: parseFloat(location.lat),
-        lon: parseFloat(location.lon)
+        lon: parseFloat(location.lon),
+        importance: parseFloat(location.importance)
     }));
 
     // Store in sessionStorage
@@ -51,21 +52,54 @@ function calcDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
-// Find the closest pair of locations
+// Find the closest pair of locations, if there are multiple locations
 async function closestLocation(start, finish) {
     const startCoords = await fetchCoordinates(start);
     const finishCoords = await fetchCoordinates(finish);
 
     let closestPair = null;
     let minDistance = Number.MAX_VALUE;
-    for (const start of startCoords) {
-        for (const finish of finishCoords) {
-            const distance = calcDistance(start.lat, start.lon, finish.lat, finish.lon);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestPair = {start, finish};
+
+    // Filter France locations
+    const startFrance = startCoords.filter(location => location.name.includes('France'));
+    const finishFrance = finishCoords.filter(location => location.name.includes('France'));
+    // Find closest pair in France
+    if (startFrance.length > 0 && finishFrance.length > 0) {
+        for (const start of startFrance) {
+            for (const finish of finishFrance) {
+                const distance = calcDistance(start.lat, start.lon, finish.lat, finish.lon);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPair = {start, finish};
+                }
             }
         }
+    } else if (startFrance.length > 0) {
+        // If start is in France, find the closest finish location
+        for (const start of startFrance) {
+            for (const finish of finishCoords) {
+                const distance = calcDistance(start.lat, start.lon, finish.lat, finish.lon);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPair = {start, finish};
+                }
+            }
+        }
+    } else if (finishFrance.length > 0) {
+        // If finish is in France, find the closest start location
+        for (const finish of finishFrance) {
+            for (const start of startCoords) {
+                const distance = calcDistance(start.lat, start.lon, finish.lat, finish.lon);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestPair = {start, finish};
+                }
+            }
+        }
+    } else { // No location in France, most important location
+        const startImportance = startCoords.reduce((prev, curr) => (prev.importance > curr.importance) ? prev : curr);
+        const finishImportance = finishCoords.reduce((prev, curr) => (prev.importance > curr.importance) ? prev : curr);
+        closestPair = {start: startImportance, finish: finishImportance};
     }
 
     if (closestPair) {
