@@ -81,6 +81,8 @@ async function updateMap(year, stagesData) {
 
     // Deactivate year selector
     document.getElementById('yearSelector').disabled = true;
+    document.getElementById('prevYear').classList.add("disabled");
+    document.getElementById('nextYear').classList.add("disabled");
 
     map.eachLayer(function (layer) {
         if (layer instanceof L.Marker || layer instanceof L.Polyline) {
@@ -95,20 +97,20 @@ async function updateMap(year, stagesData) {
         document.getElementById('loading').textContent = `Loading stage ${i + 1} of ${stages.length}...`;
 
         if (stage.Course) {
+            // Also remove the [a] part if it exists
+            stage.Course = stage.Course.replace(/\[.*?\]/g, '');
+            // Remove everything after the via part if it exists
+            stage.Course = stage.Course.split(' via ')[0];
             const courseParts = stage.Course.split(' to ');
             if (courseParts.length === 1) {
                 const coords = await fetchCoordinates(courseParts[0]);
                 if (coords) {
                     coordinates.push([coords[0].lat, coords[0].lon]);
                     L.marker([coords[0].lat, coords[0].lon], { icon: startIcon }).addTo(map).bindPopup(`${stage.Course} Start/Finish`);
-                    // Add a loop
-                    L.circle([coords[0].lat, coords[0].lon], { radius: 9000, color: 'blue'}).addTo(map).bindPopup(`${stage.Course} Loop`);
                 }
             }
             if (courseParts.length === 2) {
                 const closestLocations = await closestLocation(courseParts[0], courseParts[1]);
-                // const startCoords = await fetchCoordinates(courseParts[0]);
-                // const finishCoords = await fetchCoordinates(courseParts[1]);
                 if (closestLocations) {
                     const startCoords = [closestLocations.start.lat, closestLocations.start.lon];
                     const finishCoords = [closestLocations.finish.lat, closestLocations.finish.lon];
@@ -130,6 +132,8 @@ async function updateMap(year, stagesData) {
     document.getElementById('map').style.display = 'block';
     // Activate year selector
     document.getElementById('yearSelector').disabled = false;
+    document.getElementById('prevYear').classList.remove("disabled");
+    document.getElementById('nextYear').classList.remove("disabled");
     map.invalidateSize();    
     if (coordinates.length > 0) {
         const bounds = L.latLngBounds(coordinates);

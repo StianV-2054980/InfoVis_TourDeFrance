@@ -171,7 +171,6 @@ function updateStagesList(year, stagesData) {
             country = country.replace('[a]', '').trim();
             isDisqualified = true;
         }
-        console.log(winner, country, isDisqualified);
         let flagIcon = getFlag(country, true);
 
         if (isDisqualified) {
