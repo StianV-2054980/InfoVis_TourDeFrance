@@ -7,7 +7,7 @@ var csvFilePathTours = baseURL + '/data/tdf_tours.csv';
 var csvFilePathStages = baseURL + '/data/tdf_stages.csv';
 
 // From https://www.kaggle.com/datasets/pablomonleon/tour-de-france-historic-stages-data
-var csvFilePathStageResults = baseURL + '/data/tdf_stage_results.csv';
+var csvFilePathStageResults = baseURL + '/data/stage_data.csv';
 
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
@@ -119,7 +119,7 @@ function cleanDistance(distance) {
 }
 
 // Function to update yearly information
-async function updateInfo(year, tourData, winnerData, stagesData) {
+async function updateInfo(year, tourData, winnerData, stagesData, stageResultsData) {
     const winnerInfo = winnerData.find(row => row.Year == year) || {};
     const tourInfo = tourData.find(row => row.Year == year) || {};
 
@@ -139,13 +139,14 @@ async function updateInfo(year, tourData, winnerData, stagesData) {
     document.getElementById('stages').textContent = tourInfo.Stages || 'N/A';
     document.getElementById('speed').textContent = winnerInfo['Avg Speed'] || 'N/A';
     
-    updateStagesList(year, stagesData);
+    updateStagesList(year, stagesData, stageResultsData);
     await updateMap(year, stagesData);
 }
 
 // Update stages list
-function updateStagesList(year, stagesData) {
+function updateStagesList(year, stagesData, stageResultsData) {
     const stages = stagesData.filter(row => row.Year == year);
+    const stageResults = stageResultsData.filter(row => row.year == year);
     const stagesList = document.getElementById('stagesList');
     stagesList.innerHTML = '';
 
@@ -190,12 +191,39 @@ function updateStagesList(year, stagesData) {
         // Only do this if year is before 2020
         if (year < 2020) {
             resultsItem = divItem.appendChild(document.createElement('button'));
-            resultsItem.classList.add('btn', 'btn-primary', 'btn-sm');
+            resultsItem.classList.add('btn', 'btn-dark', 'btn-sm', 'mt-1');
+            resultsItem.id = `stage-${stage.Stage}`;
             resultsItem.textContent = 'Full stage results';
             resultsItem.addEventListener('click', async function() {
-                // Open modal and show full results per stage
+                const stageTitle = document.getElementById('resultsModalLabel');
+                stageTitle.textContent = `Stage ${stage.Stage} results`;
+                const stageResultsList = document.getElementById('resultsList');
+                stageResultsList.innerHTML = '';
+                // Get the results for the stage, by the id of the button that was pressed
+                var fullstageResults = stageResults.filter(row => row.stage_results_id == this.id);
+                // Populate the modal list
+                for (const result of fullstageResults) {
+                    console.log(result);
+                    const resultItem = document.createElement('li');
+                    resultItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+                    fullItem = resultItem.appendChild(document.createElement('div'));
+                    fullItem.classList.add('ms-2', 'me-auto');
+                    riderItem = fullItem.appendChild(document.createElement('div'));
+                    riderItem.classList.add('fw-bold');
+                    riderItem.textContent = result.rider;
+                    
+                    teamItem = fullItem.appendChild(document.createElement('div'));
+                    teamItem.classList.add('mt-1');
+                    teamItem.textContent = result.team;
+
+                    stageResultsList.appendChild(resultItem);
+                }
+                // Show the modal
+                const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+                modal.show();
             });
         }
+
         stagesList.appendChild(stageItem);
     }
 }
@@ -205,6 +233,7 @@ async function initPage() {
     const tourData = await fetchAndParseCSV(csvFilePathTours);
     const winnerData = await fetchAndParseCSV(csvFilePathWinners);
     const stagesData = await fetchAndParseCSV(csvFilePathStages);
+    const stageResultsData = await fetchAndParseCSV(csvFilePathStageResults);
 
     const yearSelector = document.getElementById('yearSelector');
     const prevYearButton = document.getElementById('prevYear');
@@ -225,7 +254,7 @@ async function initPage() {
     }
 
     // Set initial year
-    await updateInfo(currentYear, tourData, winnerData, stagesData);
+    await updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
 
     // Disable button by default
     nextYearButton.disabled = true;
@@ -233,7 +262,7 @@ async function initPage() {
     // Add event listeners
     yearSelector.addEventListener('change', function() {
         currentYear = parseInt(this.value);
-        updateInfo(currentYear, tourData, winnerData, stagesData);
+        updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
         nextYearButton.disabled = currentYear === maxYear;
         prevYearButton.disabled = currentYear === minYear;
     });
@@ -246,7 +275,7 @@ async function initPage() {
                 currentYear--;
             }
             yearSelector.value = currentYear;
-            updateInfo(currentYear, tourData, winnerData, stagesData);
+            updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
         }
         nextYearButton.disabled = false;
         prevYearButton.disabled = currentYear === minYear;
@@ -260,7 +289,7 @@ async function initPage() {
                 currentYear++;
             }
             yearSelector.value = currentYear;
-            updateInfo(currentYear, tourData, winnerData, stagesData);
+            updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
         }
         prevYearButton.disabled = false;
         nextYearButton.disabled = currentYear === maxYear;
