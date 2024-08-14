@@ -6,6 +6,9 @@ var csvFilePathWinners = baseURL + '/data/tdf_winners.csv';
 var csvFilePathTours = baseURL + '/data/tdf_tours.csv';
 var csvFilePathStages = baseURL + '/data/tdf_stages.csv';
 
+// From https://www.kaggle.com/datasets/pablomonleon/tour-de-france-historic-stages-data
+var csvFilePathStageResults = baseURL + '/data/tdf_stage_results.csv';
+
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
     const response = await fetch(csvFilePath);
@@ -177,12 +180,22 @@ function updateStagesList(year, stagesData) {
 
         if (isDisqualified) {
             scrappedItem = winnerItem.appendChild(document.createElement('s'));
-            scrappedItem.textContent = winner;
+            scrappedItem.textContent = 'Winner: ' + winner;
         } else {
-            winnerItem.textContent = winner + ' ';
+            winnerItem.textContent = 'Winner: ' + winner + ' ';
         }
         flagItem = winnerItem.appendChild(document.createElement('span'));
         flagItem.classList.add('fi', `fi-${flagIcon}`);
+
+        // Only do this if year is before 2020
+        if (year < 2020) {
+            resultsItem = divItem.appendChild(document.createElement('button'));
+            resultsItem.classList.add('btn', 'btn-primary', 'btn-sm');
+            resultsItem.textContent = 'Full stage results';
+            resultsItem.addEventListener('click', async function() {
+                // Open modal and show full results per stage
+            });
+        }
         stagesList.appendChild(stageItem);
     }
 }
