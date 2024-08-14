@@ -140,7 +140,7 @@ async function updateMap(year, stagesData) {
                 const coords = await fetchCoordinates(courseParts[0]);
                 if (coords) {
                     coordinates.push([coords[0].lat, coords[0].lon]);
-                    L.marker([coords[0].lat, coords[0].lon], { icon: startIcon }).addTo(map).bindPopup(`${stage.Course} Start/Finish`);
+                    L.marker([coords[0].lat, coords[0].lon], { icon: startIcon }).addTo(map).bindPopup(`${stage.Course} Start/Finish stage ${i + 1}`);
                 }
             }
             if (courseParts.length === 2) {
@@ -149,14 +149,9 @@ async function updateMap(year, stagesData) {
                     const startCoords = [closestLocations.start.lat, closestLocations.start.lon];
                     const finishCoords = [closestLocations.finish.lat, closestLocations.finish.lon];
                     coordinates.push(startCoords, finishCoords);
-                    L.marker(startCoords, { icon: startIcon }).addTo(map).bindPopup(`${stage.Course} Start`);
-                    L.marker(finishCoords, { icon: finishIcon }).addTo(map).bindPopup(`${stage.Course} Finish`);
-                    L.polyline([startCoords, finishCoords], { color: 'blue' }).addTo(map).bindPopup(`${stage.Course} Route`);
-
-                    // Add stage number
-                    // const midPoint = [(parseFloat(startCoords[0]) + parseFloat(finishCoords[0])) / 2, (parseFloat(startCoords[1]) + parseFloat(finishCoords[1])) / 2];
-                    // const stageNumberIcon = L.divIcon({ className: 'stage-number', html: `<p>${i + 1}</p>` });
-                    // L.marker(midPoint, { icon: stageNumberIcon }).addTo(map);
+                    L.marker(startCoords, { icon: startIcon }).addTo(map).bindPopup(`${courseParts[0]}: Start stage ${i + 1}`);
+                    L.marker(finishCoords, { icon: finishIcon }).addTo(map).bindPopup(`${courseParts[1]}: Finish stage ${i + 1}`);
+                    L.polyline([startCoords, finishCoords], { color: 'blue' }).addTo(map).bindPopup(`${stage.Course}: Route stage ${i + 1}`);
                 }
             }
         }
