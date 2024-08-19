@@ -46,7 +46,11 @@ function createDistanceChart(data) {
         title: 'Tour de France Distance (km) by Year',
         xaxis: {
             range: [1903, 2024],
-            dtick: 10
+            dtick: 10,
+            title: 'Year'
+        },
+        yaxis: {
+            title: 'Distance (km)'
         },
         shapes: [{
             type: 'rect',
@@ -136,7 +140,11 @@ function createSpeedChart(data) {
         title: 'Tour de France Winner Speed (km/h) by Year',
         xaxis: {
             range: [1903, 2024],
-            dtick: 10
+            dtick: 10,
+            title: 'Year'
+        },
+        yaxis: {
+            title: 'Speed (km/h)'
         },
         shapes: [{
             type: 'rect',
@@ -316,7 +324,8 @@ function createStagesChart(data) {
         barmode: 'stack',
         xaxis: {
             range: [1903, 2024],
-            dtick: 5
+            dtick: 5,
+            title: 'Year'
         },
         yaxis: {
             title: 'Number of Stages'
@@ -403,7 +412,11 @@ function createStartvsFinishChart(data) {
         title: 'Tour de France Starters and Finishers by Year',
         xaxis: {
             range: [Math.min(...Object.keys(yearStartersMap)), Math.max(...Object.keys(yearStartersMap))],
-            dtick: 5
+            dtick: 5,
+            title: 'Year'
+        },
+        yaxis: {
+            title: 'Number of Riders'
         },
         shapes: [{
             type: 'rect',
