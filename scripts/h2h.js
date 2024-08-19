@@ -123,6 +123,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
             mode: 'lines+markers',
             name: rider1Name,
             line: {color: '#D55E00'},
+            hovertemplate: "<b>Participation</b>: %{x}<br><b>Position</b>: %{y}"
         };
         data.push(rider1Trace);
     }
@@ -133,7 +134,8 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
             y: rider2.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
             mode: 'lines+markers',
             name: rider2Name,
-            line: {color: '#0072B2'}
+            line: {color: '#0072B2'},
+            hovertemplate: "<b>Participation</b>: %{x}<br><b>Position</b>: %{y}"
         };
         data.push(rider2Trace);
     }
