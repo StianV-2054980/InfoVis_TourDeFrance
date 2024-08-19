@@ -21,14 +21,14 @@ async function fetchAndParseCSV(csvFilePath) {
 }
 
 // Function to reset the search inputs and results
-function resetRider1() {
-    document.getElementById(`rider1-search`).value = '';
-    document.getElementById(`rider1-results`).innerHTML = '';
-}
+function resetRider(riderNbr) {
+    document.getElementById(`rider${riderNbr}-search`).value = '';
+    document.getElementById(`rider${riderNbr}-results`).innerHTML = '';
 
-function resetRider2() {
-    document.getElementById(`rider2-search`).value = '';
-    document.getElementById(`rider2-results`).innerHTML = '';
+    // Update chart
+    const rider1 = getRiderData(1);
+    const rider2 = getRiderData(2);
+    createUpdatePositionChart('yearly-positions-chart', rider1, rider2);
 }
 
 // Function to add autocomplete to an input field
@@ -53,7 +53,7 @@ function autoComplete(input, riders) {
                 autoCompItem.addEventListener('click', function() {
                     input.value = this.getElementsByTagName('input')[0].value;
                     closeAllLists();
-                    fetchRiderInfo(input.value);
+                    fetchRiderInfo(input.value, input.id === 'rider1-search' ? 1 : 2);
                 });
                 autoCompContainer.appendChild(autoCompItem);
             }
@@ -105,8 +105,41 @@ function autoComplete(input, riders) {
     });
 }
 
+function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
+    const data = [];
+    if (rider1.length > 0) {
+        const rider1Trace = {
+            x: rider1.map((row, i) => i+1),
+            y: rider1.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
+            mode: 'lines+markers',
+            name: rider1[0].Name,
+            line: {color: '#D55E00'},
+        };
+        data.push(rider1Trace);
+    }
+
+    if (rider2.length > 0) {
+        const rider2Trace = {
+            x: rider2.map((row, i) => i+1),
+            y: rider2.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
+            mode: 'lines+markers',
+            name: rider2[0].Name,
+            line: {color: '#0072B2'}
+        };
+        data.push(rider2Trace);
+    }
+
+    const layout = {
+        title: 'Yearly Positions by Participation',
+        xaxis: {title: 'Participation Number'},
+        yaxis: {title: 'Rank'},
+        margin: {t: 50, b: 50, l: 50, r: 50},
+    };
+    Plotly.newPlot(elementId, data, layout);
+}
+
 // Function to fetch and show information about a rider
-function fetchRiderInfo(rider) {
+function fetchRiderInfo(rider, riderNumber) {
     fetchAndParseCSV(csvFilePathStages).then(stageData => {
         fetchAndParseCSV(csvFilePathFinishers).then(finisherData => {
             const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.trim() === rider);
@@ -132,7 +165,35 @@ function fetchRiderInfo(rider) {
                 <p><strong>Highest Overall Position:</strong> ${highestOverall}</p>
                 <p><strong>Yearly Positions:</strong> ${yearlyPositions.map(d => `Year: ${d.Year}, Rank: ${d.Rank}`).join('<br>')}</p>
             `;
+
+            // Update chart
+            const rider1 = riderNumber === 1 ? yearlyPositions : getRiderData(1);
+            const rider2 = riderNumber === 2 ? yearlyPositions : getRiderData(2);
+            // Add rider names
+            rider1.forEach(row => row.Name = rider);
+            rider2.forEach(row => row.Name = rider);
+            createUpdatePositionChart('yearly-positions-chart', rider1, rider2);
         });
+    });
+}
+
+function getRiderData(riderNumber) {
+    const riderCard = riderNumber === 1 ? "rider1-results" : "rider2-results";
+    const riderInfo = document.getElementById(riderCard).innerHTML;
+    if (!riderInfo) return [];
+
+    const yearlyPositionsMatch = riderInfo.match(/Yearly Positions:\s*(.*)/);
+    if (!yearlyPositionsMatch) return [];
+
+    // Get rider name
+    const riderMatch = riderInfo.match(/<p><strong>Rider:<\/strong> (.*)<\/p>/);
+    if (!riderMatch) return [];
+    
+    const yearlyPositionsText = yearlyPositionsMatch[1];
+    const riderName = riderMatch[1];
+    return yearlyPositionsText.split('<br>').map(d => {
+        const [year, rank] = d.split(', Rank: ');
+        return { Year: parseInt(year.replace('Year: ', '')), Rank: rank === 'DSQ' ? 'DSQ' : parseInt(rank), Name: riderName };
     });
 }
 
@@ -144,11 +205,14 @@ async function initPage() {
         .map(row => row.Rider.trim()));
     const riders = Array.from(riderSet).sort();
 
-    document.getElementById("reset-rider1-button").addEventListener("click", resetRider1);
-    document.getElementById("reset-rider2-button").addEventListener("click", resetRider2);
+    document.getElementById('reset-rider1-button').addEventListener('click', () => resetRider(1));
+    document.getElementById('reset-rider2-button').addEventListener('click', () => resetRider(2));
     // Add autocomplete to the rider search input field
     autoComplete(document.getElementById('rider1-search'), riders);
     autoComplete(document.getElementById('rider2-search'), riders);
+
+    // Update chart
+    createUpdatePositionChart('yearly-positions-chart');
 }
 
 initPage();
