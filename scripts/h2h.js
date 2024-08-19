@@ -5,6 +5,9 @@ var baseURL = window.location.hostname === 'localhost' ? '' : '/InfoVis_TourDeFr
 var csvFilePathStages = baseURL + '/data/tdf_stages.csv';
 var csvFilePathFinishers = baseURL + '/data/tdf_finishers.csv';
 
+var rider1Name = '';
+var rider2Name = '';
+
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
     const response = await fetch(csvFilePath);
@@ -24,6 +27,12 @@ async function fetchAndParseCSV(csvFilePath) {
 function resetRider(riderNbr) {
     document.getElementById(`rider${riderNbr}-search`).value = '';
     document.getElementById(`rider${riderNbr}-results`).innerHTML = '';
+
+    if (riderNbr === 1) {
+        rider1Name = '';
+    } else {
+        rider2Name = '';
+    }
 
     // Update chart
     const rider1 = getRiderData(1);
@@ -112,7 +121,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
             x: rider1.map((row, i) => i+1),
             y: rider1.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
             mode: 'lines+markers',
-            name: rider1[0].Name,
+            name: rider1Name,
             line: {color: '#D55E00'},
         };
         data.push(rider1Trace);
@@ -123,7 +132,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
             x: rider2.map((row, i) => i+1),
             y: rider2.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
             mode: 'lines+markers',
-            name: rider2[0].Name,
+            name: rider2Name,
             line: {color: '#0072B2'}
         };
         data.push(rider2Trace);
@@ -170,8 +179,12 @@ function fetchRiderInfo(rider, riderNumber) {
             const rider1 = riderNumber === 1 ? yearlyPositions : getRiderData(1);
             const rider2 = riderNumber === 2 ? yearlyPositions : getRiderData(2);
             // Add rider names
-            rider1.forEach(row => row.Name = rider);
-            rider2.forEach(row => row.Name = rider);
+            if (riderNumber === 1) {
+                rider1Name = rider;
+            } else {
+                rider2Name = rider;
+            }
+            
             createUpdatePositionChart('yearly-positions-chart', rider1, rider2);
         });
     });
