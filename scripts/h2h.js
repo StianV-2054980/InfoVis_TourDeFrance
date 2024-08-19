@@ -132,7 +132,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
     const layout = {
         title: 'Yearly Positions by Participation',
         xaxis: {title: 'Participation Number'},
-        yaxis: {title: 'Rank'},
+        yaxis: {title: 'Rank', autorange: 'reversed'},
         margin: {t: 50, b: 50, l: 50, r: 50},
     };
     Plotly.newPlot(elementId, data, layout);
