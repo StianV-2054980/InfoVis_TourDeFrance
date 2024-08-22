@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style/navbar.css">
     <link rel="stylesheet" href="style/sidebar.css">
+    <link rel="stylesheet" href="style/h2h.css">
     <script src="https://cdn.plot.ly/plotly-2.32.0.min.js" charset="utf-8"></script>
   </head>
   <body>
@@ -55,31 +56,69 @@
     <div class="container-fluid">
         <div class="col-md-12 main-content">
             <div class="row justify-content-around">
-                <div class="col-md-5 card p-1">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <label for="rider1-search" class="form-label">Rider 1</label>
-                            <input type="text" id="rider1-search" class="form-control" placeholder="Search for Rider 1">
+                <div class="col-md-10 card p-1">
+                    <div class="row justify-content-evenly mt-2">
+                        <div class="col-md-6"> 
+                            <div class="row justify-content-center">
+                                <div class="col-md-4">
+                                    <label for="rider1-search" class="form-label">Rider 1</label>
+                                    <input type="text" id="rider1-search" class="form-control" placeholder="Search for Rider 1">
+                                </div>
+                                <div class="col-md-2 mt-2">
+                                    <button id="reset-rider1-button" class="btn btn-danger mt-4">Reset Rider</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-2 mt-2">
-                            <button id="reset-rider1-button" class="btn btn-danger mt-4">Reset Rider</button>
+                        <div class="col-md-6">
+                            <div class="row justify-content-center">
+                                <div class="col-md-4">
+                                    <label for="rider2-search" class="form-label">Rider 2</label>
+                                    <input type="text" id="rider2-search" class="form-control" placeholder="Search for Rider 2">
+                                </div>
+                                <div class="col-md-2 mt-2">
+                                    <button id="reset-rider2-button" class="btn btn-danger mt-4">Reset Rider</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center mt-4">
+                        <div class="col-md-11 table-responsive">
+                            <table class="table table-striped-columns">
+                                <thead>
+                                    <tr>
+                                        <th class="text-right" id="rider1Name"></th>
+                                        <th class="text-center">Stat</th>
+                                        <th class="text-left" id="rider2Name"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="text-right" id="rider1Overall"></td>
+                                        <td class="text-center">Overall Wins</td>
+                                        <td class="text-left" id="rider2Overall"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right" id="rider1Stages"></td>
+                                        <td class="text-center">Stage Wins</td>
+                                        <td class="text-left" id="rider2Stages"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right" id="rider1Highest"></td>
+                                        <td class="text-center">Highest Overall Position</td>
+                                        <td class="text-left" id="rider2Highest"></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-right" id="rider1Yearly"></td>
+                                        <td class="text-center">Yearly Positions</td>
+                                        <td class="text-left" id="rider2Yearly"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div id="rider1-results" class="mt-2">
 
                     </div>
-                </div>
-                <div class="col-md-5 card p-1">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <label for="rider2-search" class="form-label">Rider 2</label>
-                            <input type="text" id="rider2-search" class="form-control" placeholder="Search for Rider 2">
-                        </div>
-                        <div class="col-md-2 mt-2">
-                            <button id="reset-rider2-button" class="btn btn-danger mt-4">Reset Rider</button>
-                        </div>
-                    </div>
-                    
                     <div id="rider2-results" class="mt-2">
 
                     </div>

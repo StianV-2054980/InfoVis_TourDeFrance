@@ -7,6 +7,8 @@ var csvFilePathFinishers = baseURL + '/data/tdf_finishers.csv';
 
 var rider1Name = '';
 var rider2Name = '';
+let rider1Data = [];
+let rider2Data = [];
 
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
@@ -26,18 +28,23 @@ async function fetchAndParseCSV(csvFilePath) {
 // Function to reset the search inputs and results
 function resetRider(riderNbr) {
     document.getElementById(`rider${riderNbr}-search`).value = '';
-    document.getElementById(`rider${riderNbr}-results`).innerHTML = '';
+
+    // Reset the table
+    document.getElementById(`rider${riderNbr}Name`).innerText = '';
+    document.getElementById(`rider${riderNbr}Overall`).innerText = '';
+    document.getElementById(`rider${riderNbr}Stages`).innerText = '';
+    document.getElementById(`rider${riderNbr}Highest`).innerText = '';
+    document.getElementById(`rider${riderNbr}Yearly`).innerHTML = '';
 
     if (riderNbr === 1) {
         rider1Name = '';
+        rider1Data = [];
     } else {
         rider2Name = '';
+        rider2Data = [];
     }
 
-    // Update chart
-    const rider1 = getRiderData(1);
-    const rider2 = getRiderData(2);
-    createUpdatePositionChart('yearly-positions-chart', rider1, rider2);
+    createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data);
 }
 
 // Function to add autocomplete to an input field
@@ -183,56 +190,31 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
             //const highestStage = Math.min(...riderStages.map(row => parseInt(row.StageRank)));
             const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
 
-            // Display the information in the respective card
-            const riderCard = rider === document.getElementById("rider1-search").value ? "rider1-results" : "rider2-results";
-            document.getElementById(riderCard).innerHTML = `
-                <p><strong>Rider:</strong> ${cleanedRider}</p>
-                <p><strong>Overall Wins:</strong> ${overallWins}</p>
-                <p><strong>Stage Wins:</strong> ${stageWins}</p>
-                <p><strong>Highest Overall Position:</strong> ${highestOverall}</p>
-                <p><strong>Yearly Positions:</strong> ${yearlyPositions.map(d => `Year: ${d.Year}, Rank: ${d.Rank}`).join('<br>')}</p>
-            `;
-
-            // Add rider names
+            // Display the information in the table
             if (riderNumber === 1) {
+                document.getElementById('rider1Name').innerText = cleanedRider;
+                document.getElementById('rider1Overall').innerText = overallWins;
+                document.getElementById('rider1Stages').innerText = stageWins;
+                document.getElementById('rider1Highest').innerText = highestOverall;
+                document.getElementById('rider1Yearly').innerHTML = yearlyPositions.map(row => `Year: ${row.Year}, Rank: ${row.Rank}`).join('<br>');
                 rider1Name = cleanedRider;
+                rider1Data = yearlyPositions;
             } else {
+                document.getElementById('rider2Name').innerText = cleanedRider;
+                document.getElementById('rider2Overall').innerText = overallWins;
+                document.getElementById('rider2Stages').innerText = stageWins;
+                document.getElementById('rider2Highest').innerText = highestOverall;
+                document.getElementById('rider2Yearly').innerHTML = yearlyPositions.map(row => `Year: ${row.Year}, Rank: ${row.Rank}`).join('<br>');
                 rider2Name = cleanedRider;
+                rider2Data = yearlyPositions;
             }
-
-            // Update chart
-            const rider1 = riderNumber === 1 ? yearlyPositions : getRiderData(1);
-            const rider2 = riderNumber === 2 ? yearlyPositions : getRiderData(2);
             
             // Determine the start and end years
-            const allYears = [...rider1.map(d => d.Year), ...rider2.map(d => d.Year)];
+            const allYears = [...rider1Data.map(d => d.Year), ...rider2Data.map(d => d.Year)];
             const startYear = Math.min(...allYears);
             const endYear = Math.max(...allYears);
-            createUpdatePositionChart('yearly-positions-chart', rider1, rider2, startYear, endYear);
+            createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data, startYear, endYear);
         });
-    });
-}
-
-function getRiderData(riderNumber) {
-    const riderCard = riderNumber === 1 ? "rider1-results" : "rider2-results";
-    const riderInfo = document.getElementById(riderCard).innerHTML;
-    if (!riderInfo) return [];
-
-    const yearlyPositionsMatch = riderInfo.match(/Yearly Positions:\s*(.*)/);
-    if (!yearlyPositionsMatch) return [];
-
-    // Get rider name
-    const riderMatch = riderInfo.match(/<p><strong>Rider:<\/strong> (.*)<\/p>/);
-    if (!riderMatch) return [];
-    
-    const yearlyPositionsText = yearlyPositionsMatch[1];
-    const riderName = riderMatch[1];
-    return yearlyPositionsText.split('<br>').map(d => {
-        const yearMatch = d.match(/Year: (\d+)/);
-        const rankMatch = d.match(/Rank: (.*)/);
-        const year = yearMatch ? parseInt(yearMatch[1]) : NaN;
-        const rank = rankMatch ? (rankMatch[1] === 'DSQ' || (riderName.includes('[a]') || riderName.includes('[b]')) ? 'DSQ' : parseInt(rankMatch[1])) : NaN;
-        return { Year: year, Rank: rank, Name: riderName };
     });
 }
 
