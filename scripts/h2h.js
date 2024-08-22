@@ -180,16 +180,17 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
 
 // Function to fetch and show information about a rider
 function fetchAndShowRiderInfo(rider, riderNumber) {
-    const cleanedRider = rider.replace(/\[\w\]/g, '').trim();
+    const cleanedRider = rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim();
 
     fetchAndParseCSV(csvFilePathStages).then(stageData => {
         fetchAndParseCSV(csvFilePathFinishers).then(finisherData => {
-            const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.replace(/\[\w\]/g, '').trim() === cleanedRider);
-            const overallWins = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').trim() === cleanedRider && row.Rank === '1').length;
+            const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider);
+            console.log(riderStages);
+            const overallWins = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider && row.Rank === '1').length;
             const stageWins = riderStages.length;
-            const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' ? Infinity : parseInt(row.Rank)));
+            const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' ? Infinity : parseInt(row.Rank)));
             //const highestStage = Math.min(...riderStages.map(row => parseInt(row.StageRank)));
-            const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
+            const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
 
             // Display the information in the table
             if (riderNumber === 1) {
@@ -224,7 +225,7 @@ async function initPage() {
 
     const riderSet = new Set(finisherData
         .filter(row => row.Rider)
-        .map(row => row.Rider.trim().replace(/\[\w\]/g, '')));
+        .map(row => row.Rider.trim().replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '')));
     const riders = Array.from(riderSet).sort();
 
     document.getElementById('reset-rider1-button').addEventListener('click', () => resetRider(1));
