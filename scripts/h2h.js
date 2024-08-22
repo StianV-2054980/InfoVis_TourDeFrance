@@ -63,6 +63,7 @@ function autoComplete(input, riders) {
         for (i = 0; i < riders.length; i++) {
             if (riders[i].toUpperCase().includes(val.toUpperCase())) {
                 autoCompItem = document.createElement('div');
+                autoCompItem.setAttribute('class', 'autocomplete-item');
                 const startIndex = riders[i].toUpperCase().indexOf(val.toUpperCase());
                 autoCompItem.innerHTML = riders[i].substr(0, startIndex) + "<strong>" + riders[i].substr(startIndex, val.length) + "</strong>" + riders[i].substr(startIndex + val.length);
                 autoCompItem.innerHTML += '<input type="hidden" value="' + riders[i] + '">';

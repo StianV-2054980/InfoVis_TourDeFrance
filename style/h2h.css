@@ -2,6 +2,10 @@
     background-color: rgb(205, 205, 205);
 }
 
+.autocomplete-item:hover {
+    background-color: rgb(205, 205, 205);
+}
+
 .text-right {
     text-align: right;
 }
