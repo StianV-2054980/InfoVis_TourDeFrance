@@ -28,6 +28,12 @@ body {
     background: #ffdb77;
 }
 
-.autocomplete-active {
-    background-color: rgb(205, 205, 205);
+.main-content {
+    padding: 15px;
+}
+
+.container-fluid {
+    display: flex;
+    padding-left: 3;
+    padding-right: 0;
 }
