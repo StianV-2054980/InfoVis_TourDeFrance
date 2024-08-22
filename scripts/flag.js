@@ -1,0 +1,87 @@
+// Short country names to flag-icon-css classes
+const shortCountryFlagMap = {
+    'FRA' : 'fr',
+    'SLO' : 'si',
+    'LUX' : 'lu',
+    'BEL' : 'be',
+    'DEN' : 'dk',
+    'CHE' : 'ch',
+    'ITA' : 'it',
+    'NED' : 'nl',
+    'ESP' : 'es',
+    'IRL' : 'ie',
+    'USA' : 'us',
+    'AUS' : 'au',
+    'GER' : 'de',
+    'GBR' : 'gb',
+    'GB' : 'gb',
+    'UKR' : 'ua',
+    'COL' : 'co',
+    'SVN' : 'si',
+    'ECU' : 'ec',
+    'SVK' : 'sk',
+    'NOR' : 'no',
+    'RUS' : 'ru',
+    'SWE' : 'se',
+    'PRT' : 'pt',
+    'CZE' : 'cz',
+    'KAZ' : 'kz',
+    'AUT' : 'at',
+    'NZL' : 'nz',
+    'ZAF' : 'za',
+    'POL' : 'pl',
+    'CAN' : 'ca',
+    'EST' : 'ee',
+    'LVA' : 'lv',
+    'LTU' : 'lt',
+    'SUI' : 'ch',
+    'IRE' : 'ie',
+};
+
+// Mapping of country names to flag-icon-css classes
+const countryFlagMap = {
+    'France': 'fr',
+    'Luxembourg': 'lu',
+    'Belgium': 'be',
+    'Denmark': 'dk',
+    'Switzerland': 'ch',
+    'Italy': 'it',
+    'Netherlands': 'nl',
+    'Spain': 'es',
+    'Ireland': 'ie',
+    'United States': 'us',
+    'Australia': 'au',
+    'Germany': 'de',
+    'United Kingdom': 'gb',
+    'Great Britain': 'gb',
+    'Ukraine': 'ua',
+    'Colombia': 'co',
+    'Slovenia': 'si',
+    'Ecuador': 'ec',
+    'Slovakia': 'sk',
+    'Norway': 'no',
+    'Luxembourg': 'lu',
+    'Russia': 'ru',
+    'Sweden': 'se',
+    'Portugal': 'pt',
+    'Czech Republic': 'cz',
+    'Kazakhstan': 'kz',
+    'Austria': 'at',
+    'New Zealand': 'nz',
+    'South Africa': 'za',
+    'Poland': 'pl',
+    'Canada': 'ca',
+    'Estonia': 'ee',
+    'Latvia': 'lv',
+    'Lithuania': 'lt',
+    'USA': 'us',
+};
+
+function getFlag(country, short = false) {
+    if (short) {
+        var flagClass = shortCountryFlagMap[country] || '';
+        return flagClass;
+    }
+    var flagClass = countryFlagMap[country] || '';
+    return '<span class="fi fi-' + flagClass + '"></span>';
+}
