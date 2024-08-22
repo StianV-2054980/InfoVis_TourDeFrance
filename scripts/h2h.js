@@ -122,10 +122,10 @@ function autoComplete(input, riders) {
     });
 }
 
-function generateTicks(startYear, endYear) {
-    const range = endYear - startYear;
+// Function to generate the correct amount of ticks for the x-axis
+function generateTicks(start, end) {
+    const range = end - start;
     let step;
-
     if (range > 20) {
         step = 10;
     } else if (range > 10) {
@@ -135,13 +135,14 @@ function generateTicks(startYear, endYear) {
     }
 
     const ticks = [];
-    for (let i = startYear; i <= endYear; i += step) {
+    for (let i = start; i <= end; i += step) {
         ticks.push(i);
     }
     return ticks;
 }
 
-function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYear = 1903, endYear = 2022) {
+// Function to create or update the position chart
+function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYear = 1903, endYear = 2022, highestPosition = 1, lowestPosition = 200) {
     const data = [];
     if (rider1.length > 0) {
         const rider1Trace = {
@@ -172,10 +173,30 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
     const layout = {
         title: 'Yearly Positions',
         xaxis: {title: 'Year', tickvals: generateTicks(startYear, endYear)},
-        yaxis: {title: 'Rank', autorange: 'reversed'},
+        yaxis: {title: 'Rank', autorange: 'reversed', tickvals: generateTicks(highestPosition, lowestPosition)},
         margin: {t: 50, b: 50, l: 50, r: 50},
     };
     Plotly.newPlot(elementId, data, layout);
+}
+
+// Function to display information in the table
+function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions) {
+    document.getElementById(`rider${riderNumber}Name`).innerText = cleanedRider;
+    document.getElementById(`rider${riderNumber}Overall`).innerText = overallWins;  
+    document.getElementById(`rider${riderNumber}Stages`).innerText = stageWins;
+    document.getElementById(`rider${riderNumber}Highest`).innerText = highestOverall;
+    document.getElementById(`rider${riderNumber}Yearly`).innerHTML = yearlyPositions.map(row => `Year: ${row.Year}, Rank: ${row.Rank}`).join('<br>');
+}
+
+// Function to update the chart information
+function updateChartInformation() {
+    const allYears = [...rider1Data.map(d => d.Year), ...rider2Data.map(d => d.Year)];
+    const startYear = Math.min(...allYears);
+    const endYear = Math.max(...allYears);
+
+    const highestPosition = Math.min(...[...rider1Data.map(d => d.Rank), ...rider2Data.map(d => d.Rank)]);
+    const lowestPosition = Math.max(...[...rider1Data.map(d => d.Rank), ...rider2Data.map(d => d.Rank)]);
+    createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data, startYear, endYear, highestPosition, lowestPosition);
 }
 
 // Function to fetch and show information about a rider
@@ -192,29 +213,18 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
             const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
 
             // Display the information in the table
+            displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions);
+
+            // Save rider information
             if (riderNumber === 1) {
-                document.getElementById('rider1Name').innerText = cleanedRider;
-                document.getElementById('rider1Overall').innerText = overallWins;
-                document.getElementById('rider1Stages').innerText = stageWins;
-                document.getElementById('rider1Highest').innerText = highestOverall;
-                document.getElementById('rider1Yearly').innerHTML = yearlyPositions.map(row => `Year: ${row.Year}, Rank: ${row.Rank}`).join('<br>');
                 rider1Name = cleanedRider;
                 rider1Data = yearlyPositions;
             } else {
-                document.getElementById('rider2Name').innerText = cleanedRider;
-                document.getElementById('rider2Overall').innerText = overallWins;
-                document.getElementById('rider2Stages').innerText = stageWins;
-                document.getElementById('rider2Highest').innerText = highestOverall;
-                document.getElementById('rider2Yearly').innerHTML = yearlyPositions.map(row => `Year: ${row.Year}, Rank: ${row.Rank}`).join('<br>');
                 rider2Name = cleanedRider;
                 rider2Data = yearlyPositions;
             }
             
-            // Determine the start and end years
-            const allYears = [...rider1Data.map(d => d.Year), ...rider2Data.map(d => d.Year)];
-            const startYear = Math.min(...allYears);
-            const endYear = Math.max(...allYears);
-            createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data, startYear, endYear);
+            updateChartInformation();
         });
     });
 }
