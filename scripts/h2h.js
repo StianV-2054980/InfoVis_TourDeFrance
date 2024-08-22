@@ -180,12 +180,28 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
 }
 
 // Function to display information in the table
-function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions) {
+function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions, stageWinYears) {
     document.getElementById(`rider${riderNumber}Name`).innerText = cleanedRider;
     document.getElementById(`rider${riderNumber}Overall`).innerText = overallWins;  
     document.getElementById(`rider${riderNumber}Stages`).innerText = stageWins;
-    document.getElementById(`rider${riderNumber}Highest`).innerText = highestOverall;
-    document.getElementById(`rider${riderNumber}Yearly`).innerHTML = yearlyPositions.map(row => `Year: ${row.Year}, Rank: ${row.Rank}`).join('<br>');
+    document.getElementById(`rider${riderNumber}Highest`).innerText = highestOverall == Infinity ? 'DNF' : highestOverall;
+    console.log(stageWinYears);
+
+    const yearRankMap = new Map();
+    yearlyPositions.forEach(row => {
+        yearRankMap.set(row.Year, row.Rank);
+    });
+    stageWinYears.forEach(year => { // Add stage win years to the map if they don't already exist
+        if (!yearRankMap.has(year)) {
+            yearRankMap.set(year, 'DNF');
+        }
+    });
+    const combinedResults = Array.from(yearRankMap.entries())
+        .sort((a, b) => a[0] - b[0])
+        .map(([year, rank]) => `Year: ${year}, Rank: ${rank}`)
+        .join('<br>');
+        
+    document.getElementById(`rider${riderNumber}Yearly`).innerHTML = combinedResults;
 }
 
 // Function to update the chart information
@@ -201,19 +217,20 @@ function updateChartInformation() {
 
 // Function to fetch and show information about a rider
 function fetchAndShowRiderInfo(rider, riderNumber) {
-    const cleanedRider = rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim();
+    const cleanedRider = rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim();
 
     fetchAndParseCSV(csvFilePathStages).then(stageData => {
         fetchAndParseCSV(csvFilePathFinishers).then(finisherData => {
-            const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider);
-            const overallWins = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider && row.Rank === '1').length;
+            const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider);
+            const overallWins = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider && row.Rank === '1' && !((row.Rider.includes('[a]') || row.Rider.includes('[b]')))).length;
             const stageWins = riderStages.length;
-            const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' ? Infinity : parseInt(row.Rank)));
+            const stageWinYears = riderStages.map(row => row.Year);
+            const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 500 : parseInt(row.Rank)));
             //const highestStage = Math.min(...riderStages.map(row => parseInt(row.StageRank)));
-            const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
+            const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
 
             // Display the information in the table
-            displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions);
+            displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions, stageWinYears);
 
             // Save rider information
             if (riderNumber === 1) {
@@ -231,10 +248,12 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
 
 async function initPage() {
     const finisherData = await fetchAndParseCSV(csvFilePathFinishers);
+    const stageData = await fetchAndParseCSV(csvFilePathStages);
 
-    const riderSet = new Set(finisherData
-        .filter(row => row.Rider)
-        .map(row => row.Rider.trim().replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '')));
+    const riderSet = new Set([
+        ...finisherData.filter(row => row.Rider).map(row => row.Rider.trim().replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '')),
+        ...stageData.filter(row => row.Winner).map(row => row.Winner.trim().replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, ''))
+    ]);
     const riders = Array.from(riderSet).sort();
 
     document.getElementById('reset-rider1-button').addEventListener('click', () => resetRider(1));
