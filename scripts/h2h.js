@@ -142,7 +142,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
             mode: 'markers',
             type: 'scatter',
             name: rider1Name,
-            line: {color: '#D55E00'},
+            marker: {color: '#D55E00', size: 7},
             hovertemplate: "<b>Participation</b>: %{x}<br><b>Position</b>: %{y}"
         };
         data.push(rider1Trace);
@@ -155,7 +155,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
             mode: 'markers',
             type: 'scatter',
             name: rider2Name,
-            line: {color: '#0072B2'},
+            marker: {color: '#0072B2', size: 7},
             hovertemplate: "<b>Participation</b>: %{x}<br><b>Position</b>: %{y}"
         };
         data.push(rider2Trace);
