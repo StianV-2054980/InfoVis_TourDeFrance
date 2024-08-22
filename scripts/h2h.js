@@ -62,7 +62,7 @@ function autoComplete(input, riders) {
                 autoCompItem.addEventListener('click', function() {
                     input.value = this.getElementsByTagName('input')[0].value;
                     closeAllLists();
-                    fetchRiderInfo(input.value, input.id === 'rider1-search' ? 1 : 2);
+                    fetchAndShowRiderInfo(input.value, input.id === 'rider1-search' ? 1 : 2);
                 });
                 autoCompContainer.appendChild(autoCompItem);
             }
@@ -114,13 +114,33 @@ function autoComplete(input, riders) {
     });
 }
 
-function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
+function generateTicks(startYear, endYear) {
+    const range = endYear - startYear;
+    let step;
+
+    if (range > 20) {
+        step = 10;
+    } else if (range > 10) {
+        step = 5;
+    } else {
+        step = 1;
+    }
+
+    const ticks = [];
+    for (let i = startYear; i <= endYear; i += step) {
+        ticks.push(i);
+    }
+    return ticks;
+}
+
+function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYear = 1903, endYear = 2022) {
     const data = [];
     if (rider1.length > 0) {
         const rider1Trace = {
-            x: rider1.map((row, i) => i+1),
+            x: rider1.map(row => row.Year),
             y: rider1.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
-            mode: 'lines+markers',
+            mode: 'markers',
+            type: 'scatter',
             name: rider1Name,
             line: {color: '#D55E00'},
             hovertemplate: "<b>Participation</b>: %{x}<br><b>Position</b>: %{y}"
@@ -130,9 +150,10 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
 
     if (rider2.length > 0) {
         const rider2Trace = {
-            x: rider2.map((row, i) => i+1),
+            x: rider2.map(row => row.Year),
             y: rider2.map(row => row.Rank === 'DSQ' ? 0 : parseInt(row.Rank)),
-            mode: 'lines+markers',
+            mode: 'markers',
+            type: 'scatter',
             name: rider2Name,
             line: {color: '#0072B2'},
             hovertemplate: "<b>Participation</b>: %{x}<br><b>Position</b>: %{y}"
@@ -141,8 +162,8 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
     }
 
     const layout = {
-        title: 'Yearly Positions by Participation',
-        xaxis: {title: 'Participation Number'},
+        title: 'Yearly Positions',
+        xaxis: {title: 'Year', tickvals: generateTicks(startYear, endYear)},
         yaxis: {title: 'Rank', autorange: 'reversed'},
         margin: {t: 50, b: 50, l: 50, r: 50},
     };
@@ -150,7 +171,7 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = []) {
 }
 
 // Function to fetch and show information about a rider
-function fetchRiderInfo(rider, riderNumber) {
+function fetchAndShowRiderInfo(rider, riderNumber) {
     const cleanedRider = rider.replace(/\[\w\]/g, '').trim();
 
     fetchAndParseCSV(csvFilePathStages).then(stageData => {
@@ -161,13 +182,6 @@ function fetchRiderInfo(rider, riderNumber) {
             const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' ? Infinity : parseInt(row.Rank)));
             //const highestStage = Math.min(...riderStages.map(row => parseInt(row.StageRank)));
             const yearlyPositions = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').trim() === cleanedRider).map(row => ({ Year: row.Year, Rank: row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 'DSQ' : parseInt(row.Rank) }));
-
-            console.log(`Rider: ${cleanedRider}`);
-            console.log(`Overall Wins: ${overallWins}`);
-            console.log(`Stage Wins: ${stageWins}`);
-            console.log(`Highest Overall Position: ${highestOverall}`);
-            //console.log(`Highest Stage Position: ${highestStagePosition}`);
-            console.log(`Yearly Positions: ${JSON.stringify(yearlyPositions)}`);
 
             // Display the information in the respective card
             const riderCard = rider === document.getElementById("rider1-search").value ? "rider1-results" : "rider2-results";
@@ -190,7 +204,11 @@ function fetchRiderInfo(rider, riderNumber) {
             const rider1 = riderNumber === 1 ? yearlyPositions : getRiderData(1);
             const rider2 = riderNumber === 2 ? yearlyPositions : getRiderData(2);
             
-            createUpdatePositionChart('yearly-positions-chart', rider1, rider2);
+            // Determine the start and end years
+            const allYears = [...rider1.map(d => d.Year), ...rider2.map(d => d.Year)];
+            const startYear = Math.min(...allYears);
+            const endYear = Math.max(...allYears);
+            createUpdatePositionChart('yearly-positions-chart', rider1, rider2, startYear, endYear);
         });
     });
 }
@@ -210,8 +228,11 @@ function getRiderData(riderNumber) {
     const yearlyPositionsText = yearlyPositionsMatch[1];
     const riderName = riderMatch[1];
     return yearlyPositionsText.split('<br>').map(d => {
-        const [year, rank] = d.split(', Rank: ');
-        return { Year: parseInt(year.replace('Year: ', '')), Rank: rank === 'DSQ' || (riderName.includes('[a]') || riderName.includes('[b]')) ? 'DSQ' : parseInt(rank), Name: riderName };
+        const yearMatch = d.match(/Year: (\d+)/);
+        const rankMatch = d.match(/Rank: (.*)/);
+        const year = yearMatch ? parseInt(yearMatch[1]) : NaN;
+        const rank = rankMatch ? (rankMatch[1] === 'DSQ' || (riderName.includes('[a]') || riderName.includes('[b]')) ? 'DSQ' : parseInt(rankMatch[1])) : NaN;
+        return { Year: year, Rank: rank, Name: riderName };
     });
 }
 
