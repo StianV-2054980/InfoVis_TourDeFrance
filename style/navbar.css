@@ -27,3 +27,7 @@
 body {
     background: #ffdb77;
 }
+
+.autocomplete-active {
+    background-color: rgb(205, 205, 205);
+}
