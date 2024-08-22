@@ -55,6 +55,89 @@ async function updateInfo(year, tourData, winnerData, stagesData, stageResultsDa
     await updateMap(year, stagesData);
 }
 
+// Populate results list
+function populateResultsList(fullstageResults, stageResultsList) {
+    for (const result of fullstageResults) {
+        const resultItem = document.createElement('li');
+        resultItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
+        fullItem = resultItem.appendChild(document.createElement('div'));
+        fullItem.classList.add('ms-2', 'me-auto');
+        riderItem = fullItem.appendChild(document.createElement('div'));
+        riderItem.classList.add('fw-bold');
+        riderItem.textContent = result.rider;
+        
+        teamItem = fullItem.appendChild(document.createElement('div'));
+        teamItem.classList.add('mt-1');
+        teamItem.textContent = result.team;
+
+        stageResultsList.appendChild(resultItem);
+    }
+}
+
+// Show results
+function showResults(stage, stageResults, divItem) {
+    resultsItem = divItem.appendChild(document.createElement('button'));
+    resultsItem.classList.add('btn', 'btn-dark', 'btn-sm', 'mt-1');
+    resultsItem.id = `stage-${stage.Stage}`;
+    resultsItem.textContent = 'Full stage results';
+    resultsItem.addEventListener('click', async function() {
+        const stageTitle = document.getElementById('resultsModalLabel');
+        stageTitle.textContent = `Stage ${stage.Stage} results`;
+        const stageResultsList = document.getElementById('resultsList');
+        
+        // Get the results for the stage, by the id of the button that was pressed
+        var fullstageResults = stageResults.filter(row => row.stage_results_id == this.id);
+        // Populate the modal list
+        stageResultsList.innerHTML = '';
+        populateResultsList(fullstageResults, stageResultsList);
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+        modal.show();
+    });
+}
+
+// Parses the winner
+function parseWinner(winner) {
+    let country = '';
+    let isDisqualified = false;
+    if (winner.includes('(')) {
+        const parts = winner.split('(');
+        winner = parts[0].trim();
+        country = parts[1].replace(')', '');
+    }
+    if (country.includes('[a]')) {
+        country = country.replace('[a]', '').trim();
+        isDisqualified = true;
+    }
+
+    return { winner, country, isDisqualified };
+}
+
+// Creates the course item
+function createCourseItem(divItem, stage) {
+    courseItem = divItem.appendChild(document.createElement('div'));
+    courseItem.classList.add('fw-bold');
+    stage.Course = stage.Course.replace(/\[.*?\]/g, '');
+    courseItem.textContent = stage.Course;
+}
+
+// Creates the winner item
+function createWinnerItem(divItem, winner, country, isDisqualified) {
+    winnerItem = divItem.appendChild(document.createElement('div'));
+    let flagIcon = getFlag(country, true);
+
+    if (isDisqualified) {
+        scrappedItem = winnerItem.appendChild(document.createElement('s'));
+        scrappedItem.textContent = 'Winner: ' + winner;
+    } else {
+        winnerItem.textContent = 'Winner: ' + winner + ' ';
+    }
+
+    flagItem = winnerItem.appendChild(document.createElement('span'));
+    flagItem.classList.add('fi', `fi-${flagIcon}`);
+}
+
 // Update stages list
 function updateStagesList(year, stagesData, stageResultsData) {
     const stages = stagesData.filter(row => row.Year == year);
@@ -69,71 +152,14 @@ function updateStagesList(year, stagesData, stageResultsData) {
         divItem = stageItem.appendChild(document.createElement('div'));
         divItem.classList.add('ms-2', 'me-auto');
 
-        courseItem = divItem.appendChild(document.createElement('div'));
-        courseItem.classList.add('fw-bold');
-        stage.Course = stage.Course.replace(/\[.*?\]/g, '');
-        courseItem.textContent = stage.Course;
+        createCourseItem(divItem, stage);
 
-        winnerItem = divItem.appendChild(document.createElement('div'));
-        
-        let winner = stage.Winner || 'N/A';
-        // Cut away the parentheses, and remember the country inside the parentheses
-        let country = '';
-        let isDisqualified = false;
-        if (winner.includes('(')) {
-            const parts = winner.split('(');
-            winner = parts[0].trim();
-            country = parts[1].replace(')', '');
-        }
-        if (country.includes('[a]')) {
-            country = country.replace('[a]', '').trim();
-            isDisqualified = true;
-        }
-        let flagIcon = getFlag(country, true);
-
-        if (isDisqualified) {
-            scrappedItem = winnerItem.appendChild(document.createElement('s'));
-            scrappedItem.textContent = 'Winner: ' + winner;
-        } else {
-            winnerItem.textContent = 'Winner: ' + winner + ' ';
-        }
-        flagItem = winnerItem.appendChild(document.createElement('span'));
-        flagItem.classList.add('fi', `fi-${flagIcon}`);
+        let { winner, country, isDisqualified } = parseWinner(stage.Winner || 'N/A');
+        createWinnerItem(divItem, winner, country, isDisqualified);
 
         // Only do this if year is before 2020
         if (year < 2020) {
-            resultsItem = divItem.appendChild(document.createElement('button'));
-            resultsItem.classList.add('btn', 'btn-dark', 'btn-sm', 'mt-1');
-            resultsItem.id = `stage-${stage.Stage}`;
-            resultsItem.textContent = 'Full stage results';
-            resultsItem.addEventListener('click', async function() {
-                const stageTitle = document.getElementById('resultsModalLabel');
-                stageTitle.textContent = `Stage ${stage.Stage} results`;
-                const stageResultsList = document.getElementById('resultsList');
-                stageResultsList.innerHTML = '';
-                // Get the results for the stage, by the id of the button that was pressed
-                var fullstageResults = stageResults.filter(row => row.stage_results_id == this.id);
-                // Populate the modal list
-                for (const result of fullstageResults) {
-                    console.log(result);
-                    const resultItem = document.createElement('li');
-                    resultItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
-                    fullItem = resultItem.appendChild(document.createElement('div'));
-                    fullItem.classList.add('ms-2', 'me-auto');
-                    riderItem = fullItem.appendChild(document.createElement('div'));
-                    riderItem.classList.add('fw-bold');
-                    riderItem.textContent = result.rider;
-                    
-                    teamItem = fullItem.appendChild(document.createElement('div'));
-                    teamItem.classList.add('mt-1');
-                    teamItem.textContent = result.team;
-
-                    stageResultsList.appendChild(resultItem);
-                }
-                // Show the modal
-                const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
-                modal.show();
-            });
+            showResults(stage, stageResults, divItem);
         }
 
         stagesList.appendChild(stageItem);
