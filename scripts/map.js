@@ -42,6 +42,7 @@ async function fetchCoordinates(location) {
     return coordinates;
 }
 
+// Calculate distance between two coordinates
 function calcDistance(lat1, lon1, lat2, lon2) {
     const R = 6371; // earth radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -113,12 +114,11 @@ async function closestLocation(start, finish) {
 async function updateMap(year, stagesData) {
     document.getElementById('loading').style.display = 'flex';
     document.getElementById('map').style.display = 'none';
-
-    // Deactivate year selector
     document.getElementById('yearSelector').disabled = true;
     document.getElementById('prevYear').classList.add("disabled");
     document.getElementById('nextYear').classList.add("disabled");
 
+    // Remove all markers and polylines
     map.eachLayer(function (layer) {
         if (layer instanceof L.Marker || layer instanceof L.Polyline) {
             map.removeLayer(layer);
@@ -160,10 +160,10 @@ async function updateMap(year, stagesData) {
 
     document.getElementById('loading').style.display = 'none';
     document.getElementById('map').style.display = 'block';
-    // Activate year selector
     document.getElementById('yearSelector').disabled = false;
     document.getElementById('prevYear').classList.remove("disabled");
     document.getElementById('nextYear').classList.remove("disabled");
+
     map.invalidateSize();    
     if (coordinates.length > 0) {
         const bounds = L.latLngBounds(coordinates);
