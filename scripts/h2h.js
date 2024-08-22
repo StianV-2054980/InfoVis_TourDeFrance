@@ -185,7 +185,6 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
     fetchAndParseCSV(csvFilePathStages).then(stageData => {
         fetchAndParseCSV(csvFilePathFinishers).then(finisherData => {
             const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider);
-            console.log(riderStages);
             const overallWins = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider && row.Rank === '1').length;
             const stageWins = riderStages.length;
             const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[\w\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' ? Infinity : parseInt(row.Rank)));
