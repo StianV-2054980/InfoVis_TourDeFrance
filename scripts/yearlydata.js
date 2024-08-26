@@ -127,6 +127,7 @@ function generateTeamFilter(fullstageResults) {
     const teamFilter = document.getElementById('teamFilters');
     teamFilter.innerHTML = '';
 
+    console.log(fullstageResults);
     const teams = [...new Set(fullstageResults.map(result => result.team))];
     teams.sort();
 
@@ -160,7 +161,7 @@ function generateTeamFilter(fullstageResults) {
 function showResults(stage, stageResults, divItem) {
     resultsItem = divItem.appendChild(document.createElement('button'));
     resultsItem.classList.add('btn', 'btn-dark', 'btn-sm', 'mt-1');
-    resultsItem.id = `stage-${stage.Stage}`;
+    resultsItem.id = stage.Stage === 'P' ? `stage-0` : `stage-${stage.Stage}`;
     resultsItem.textContent = 'Full stage results';
     resultsItem.addEventListener('click', async function() {
         const stageTitle = document.getElementById('resultsModalLabel');
