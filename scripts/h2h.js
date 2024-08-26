@@ -50,10 +50,12 @@ function resetRider(riderNbr) {
         rider1Name = '';
         rider1Data = [];
         rider1Stages = {};
+        sessionStorage.removeItem('rider1');
     } else {
         rider2Name = '';
         rider2Data = [];
         rider2Stages = {};
+        sessionStorage.removeItem('rider2');
     }
 
     createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data);
@@ -429,10 +431,12 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
                 rider1Name = cleanedRider;
                 rider1Data = yearlyPositions;
                 rider1Stages = {mountain: mountainStages, hilly: hillyStages, flat: flatStages, tt: timeTrialStages, ttt: teamTimeTrialStages};
+                sessionStorage.setItem('rider1', cleanedRider);
             } else {
                 rider2Name = cleanedRider;
                 rider2Data = yearlyPositions;
                 rider2Stages = {mountain: mountainStages, hilly: hillyStages, flat: flatStages, tt: timeTrialStages, ttt: teamTimeTrialStages};
+                sessionStorage.setItem('rider2', cleanedRider);
             }
             
             updateChartInformation();
@@ -458,6 +462,18 @@ async function initPage() {
 
     // Update chart
     createUpdatePositionChart('yearly-positions-chart');
+
+    // When there are riders saved in session storage, fetch and show the information
+    const rider1 = sessionStorage.getItem('rider1');
+    const rider2 = sessionStorage.getItem('rider2');
+    if (rider1) {
+        document.getElementById('rider1-search').value = rider1;
+        fetchAndShowRiderInfo(rider1, 1);
+    }
+    if (rider2) {
+        document.getElementById('rider2-search').value = rider2;
+        fetchAndShowRiderInfo(rider2, 2);
+    }
 }
 
 initPage();
