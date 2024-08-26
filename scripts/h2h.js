@@ -43,6 +43,9 @@ function resetRider(riderNbr) {
     document.getElementById(`rider${riderNbr}Stages`).classList.remove('table-success');
     document.getElementById(`rider${riderNbr}Highest`).classList.remove('table-success');
 
+    // Reset the image
+    document.getElementById(`rider${riderNbr}Image`).src = 'https://cdn.pixabay.com/photo/2012/04/18/00/07/silhouette-of-a-man-36181_1280.png';
+
     if (riderNbr === 1) {
         rider1Name = '';
         rider1Data = [];
@@ -233,12 +236,38 @@ function createUpdateStageWinsChart(elementId, rider1Stages = {}, rider2Stages =
     Plotly.newPlot(elementId, data, layout);
 }
 
+// Function to fetch the rider image
+async function fetchRiderImage(rider) {
+    const riderName = rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim().toLowerCase().replace(/\s+/g, '-').replace('č', 'c').replace('š', 's').replace('ž', 'z');
+    const pcsUrl = `https://corsproxy.io/?https://www.procyclingstats.com/rider/${riderName}`;
+
+    try {
+        const response = await fetch(pcsUrl);
+        const text = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        const riderImgElement = doc.querySelector('.rdr-img-cont img');
+
+        if (riderImgElement) {
+            return `https://www.procyclingstats.com/${riderImgElement.getAttribute('src')}`;
+        } else {
+            return 'https://cdn.pixabay.com/photo/2012/04/18/00/07/silhouette-of-a-man-36181_1280.png';
+        }
+    } catch (error) {
+        return 'https://cdn.pixabay.com/photo/2012/04/18/00/07/silhouette-of-a-man-36181_1280.png';
+    }
+}
+
 // Function to display information in the table
 function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions, stageWinYears) {
     document.getElementById(`rider${riderNumber}Name`).innerText = cleanedRider;
     document.getElementById(`rider${riderNumber}Overall`).innerText = overallWins;
     document.getElementById(`rider${riderNumber}Stages`).innerText = stageWins;
     document.getElementById(`rider${riderNumber}Highest`).innerText = highestOverall == Infinity ? 'DNF' : highestOverall;
+
+    fetchRiderImage(cleanedRider).then((imageSrc) => {
+        document.getElementById(`rider${riderNumber}Image`).src = imageSrc;
+    });
 
     const yearRankMap = new Map();
     yearlyPositions.forEach(row => {
