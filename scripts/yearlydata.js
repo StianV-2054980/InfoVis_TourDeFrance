@@ -128,6 +128,7 @@ function generateTeamFilter(fullstageResults) {
     teamFilter.innerHTML = '';
 
     const teams = [...new Set(fullstageResults.map(result => result.team))];
+    teams.sort();
 
     teams.forEach(team => {
         const formCheck = document.createElement('div');
