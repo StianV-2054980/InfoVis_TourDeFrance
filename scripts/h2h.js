@@ -213,7 +213,6 @@ function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, h
 // Function to highlight the best overall
 function highlightBestOverall(rider1Overall, rider2Overall) {
     if (rider1Overall > rider2Overall) {
-        console.log('rider1Overall', rider1Overall);
         document.getElementById('rider1Overall').classList.add('table-success');
         document.getElementById('rider2Overall').classList.remove('table-success');
     } else if (rider2Overall > rider1Overall) {
