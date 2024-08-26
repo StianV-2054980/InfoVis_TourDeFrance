@@ -25,7 +25,10 @@ async function fetchCoordinates(location) {
     var response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
     var data = await response.json();
     if(data.length === 0) {
-        // Try again with only the country inside the location in parentheses
+        // Try again with only the country inside the location in parentheses only if there are parentheses
+        if (!location.includes('(')) {
+            return null;
+        }
         const country = location.match(/\(([^)]+)\)/)[1];
         response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(country)}`);
         data = await response.json();
