@@ -127,7 +127,6 @@ function generateTeamFilter(fullstageResults) {
     const teamFilter = document.getElementById('teamFilters');
     teamFilter.innerHTML = '';
 
-    console.log(fullstageResults);
     const teams = [...new Set(fullstageResults.map(result => result.team))];
     teams.sort();
 

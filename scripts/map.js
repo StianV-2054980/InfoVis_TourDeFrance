@@ -16,6 +16,7 @@ var finishIcon = L.divIcon({ className: 'custom-icon', html: '<i class="fa fa-fl
 
 // Fetch coordinates of a location string
 async function fetchCoordinates(location) {
+    sessionStorage.clear(); // Clear sessionStorage for new search
     // Check if location is in sessionStorage
     const cachedLocation = sessionStorage.getItem(location);
     if (cachedLocation) {
@@ -141,7 +142,10 @@ async function updateMap(year, stagesData) {
             stage.Course = stage.Course.split(' via ')[0];
             const courseParts = stage.Course.split(' to ');
             if (courseParts.length === 1) {
-                const coords = await fetchCoordinates(courseParts[0]);
+                let coords = await fetchCoordinates(courseParts[0]);
+                // Get coordinate in France if there are multiple locations
+                franceCoords = coords.filter(location => location.name.includes('France'));
+                coords = franceCoords.length > 0 ? franceCoords : coords;
                 if (coords) {
                     coordinates.push([coords[0].lat, coords[0].lon]);
                     L.marker([coords[0].lat, coords[0].lon], { icon: startIcon }).addTo(map).bindPopup(`${stage.Course} Start/Finish stage ${i + 1}`);
