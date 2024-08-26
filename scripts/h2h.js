@@ -9,6 +9,8 @@ var rider1Name = '';
 var rider2Name = '';
 let rider1Data = [];
 let rider2Data = [];
+let rider1Stages = {};
+let rider2Stages = {};
 
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
@@ -44,12 +46,15 @@ function resetRider(riderNbr) {
     if (riderNbr === 1) {
         rider1Name = '';
         rider1Data = [];
+        rider1Stages = {};
     } else {
         rider2Name = '';
         rider2Data = [];
+        rider2Stages = {};
     }
 
     createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data);
+    createUpdateStageWinsChart('stage-wins-radar', rider1Stages, rider2Stages);
 }
 
 // Function to add autocomplete to an input field
@@ -184,6 +189,50 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
     Plotly.newPlot(elementId, data, layout);
 }
 
+// Function to create or update the stage wins chart
+function createUpdateStageWinsChart(elementId, rider1Stages = {}, rider2Stages = {}) {
+    const maxStageWins = Math.max(
+        ...Object.values(rider1Stages),
+        ...Object.values(rider2Stages)
+    );
+    const data = [
+        {
+            type: 'scatterpolar',
+            r: [rider1Stages.mountain, rider1Stages.hilly, rider1Stages.flat, rider1Stages.tt, rider1Stages.ttt],
+            theta: ['Mountain', 'Hilly', 'Flat', 'Time Trial', 'Team Time Trial'],
+            fill: 'toself',
+            name: rider1Name,
+            hovertemplate: 'Type: %{theta}<br>Wins: %{r}<extra></extra>'
+        },
+        {
+            type: 'scatterpolar',
+            r: [rider2Stages.mountain, rider2Stages.hilly, rider2Stages.flat, rider2Stages.tt, rider2Stages.ttt],
+            theta: ['Mountain', 'Hilly', 'Flat', 'Time Trial', 'Team Time Trial'],
+            fill: 'toself',
+            name: rider2Name,
+            hovertemplate: 'Type: %{theta}<br>Wins: %{r}<extra></extra>'
+        }
+    ];
+
+    const layout = {
+        title: 'Stage Wins per Type',
+        polar: {
+            radialaxis: {
+                visible: true,
+                range: [0, maxStageWins],
+                tickvals: Array.from({length: maxStageWins + 1}, (_, i) => i),
+            }
+        },
+        showlegend: true
+    };
+
+    if (maxStageWins > 10) {
+        layout.polar.radialaxis.tickvals = Array.from({length: Math.floor(maxStageWins / 5) + 1}, (_, i) => i * 5);
+    }
+
+    Plotly.newPlot(elementId, data, layout);
+}
+
 // Function to display information in the table
 function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions, stageWinYears) {
     document.getElementById(`rider${riderNumber}Name`).innerText = cleanedRider;
@@ -275,6 +324,57 @@ function updateChartInformation() {
     const highestPosition = Math.min(...[...rider1Data.map(d => d.Rank), ...rider2Data.map(d => d.Rank)]);
     const lowestPosition = Math.max(...[...rider1Data.map(d => d.Rank), ...rider2Data.map(d => d.Rank)]);
     createUpdatePositionChart('yearly-positions-chart', rider1Data, rider2Data, startYear, endYear, highestPosition, lowestPosition);
+    createUpdateStageWinsChart('stage-wins-radar', rider1Stages, rider2Stages);
+}
+
+// Function to get the stage win types
+function getStageWinsTypes(riderStages) {
+    const stageTypes = ['Flat stage', 'Mountain stage', 'Hilly stage', 'Team time trial', 'Individual time trial', 'Unknown'];
+    const stageCount = {};
+
+    // Initialize stageCount
+    stageTypes.forEach(type => {
+        stageCount[type] = 0;
+    });
+
+    riderStages.forEach(row => {
+        let stageType = row['Type'];
+
+        // Check if stageType is defined
+        if (!stageType) {
+            return;
+        }
+
+        // Categorize Mountain time trial with Individual time trial
+        if (stageType === 'Mountain time trial') {
+            stageType = 'Individual time trial';
+        }
+        // Categorize Plain stage with cobblestones with Flat stage
+        else if (stageType === 'Plain stage with cobblestones' || stageType === 'Flat cobblestone stage') {
+            stageType = 'Flat stage';
+        }
+        // Rename Plain stage to Flat stage
+        else if (stageType === 'Plain stage' || stageType === 'Flat' || stageType === 'Flat Stage') {
+            stageType = 'Flat stage';
+        }
+        // Categorize Medium-mountain stage with Hilly stage
+        else if (stageType === 'Hilly Stage' || stageType === 'Medium-mountain stage' || stageType === 'Medium mountain stage') {
+            stageType = 'Hilly stage';
+        }
+        // Rename Stage with mountain(s) to Mountain stage
+        else if (stageType === 'Stage with mountain(s)' || stageType === 'High mountain stage' || stageType === 'Mountain Stage (s)' || stageType === 'Mountain Stage' || stageType === 'Stage with mountains' || stageType === 'Stage with mountain') {
+            stageType = 'Mountain stage';
+        }
+        else if (stageType !== 'Flat stage' && stageType !== 'Mountain stage' && stageType !== 'Hilly stage' && stageType !== 'Team time trial' && stageType !== 'Individual time trial') {
+            stageType = 'Unknown';
+        }
+
+        if (stageTypes.includes(stageType)) {
+            stageCount[stageType]++;
+        }
+    });
+
+    return [stageCount['Mountain stage'], stageCount['Hilly stage'], stageCount['Flat stage'], stageCount['Individual time trial'], stageCount['Team time trial']];
 }
 
 // Function to fetch and show information about a rider
@@ -285,6 +385,7 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
         fetchAndParseCSV(csvFilePathFinishers).then(finisherData => {
             const riderStages = stageData.filter(row => row.Winner).filter(row => row.Winner.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider);
             const overallWins = finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider && row.Rank === '1' && !((row.Rider.includes('[a]') || row.Rider.includes('[b]')))).length;
+            const [mountainStages, hillyStages, flatStages, timeTrialStages, teamTimeTrialStages] = getStageWinsTypes(riderStages);
             const stageWins = riderStages.length;
             const stageWinYears = riderStages.map(row => row.Year);
             const highestOverall = Math.min(...finisherData.filter(row => row.Rider).filter(row => row.Rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim() === cleanedRider).map(row => row.Rank === 'DSQ' || (row.Rider.includes('[a]') || row.Rider.includes('[b]')) ? 500 : parseInt(row.Rank)));
@@ -298,9 +399,11 @@ function fetchAndShowRiderInfo(rider, riderNumber) {
             if (riderNumber === 1) {
                 rider1Name = cleanedRider;
                 rider1Data = yearlyPositions;
+                rider1Stages = {mountain: mountainStages, hilly: hillyStages, flat: flatStages, tt: timeTrialStages, ttt: teamTimeTrialStages};
             } else {
                 rider2Name = cleanedRider;
                 rider2Data = yearlyPositions;
+                rider2Stages = {mountain: mountainStages, hilly: hillyStages, flat: flatStages, tt: timeTrialStages, ttt: teamTimeTrialStages};
             }
             
             updateChartInformation();
