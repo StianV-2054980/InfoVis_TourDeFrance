@@ -16,7 +16,6 @@ var finishIcon = L.divIcon({ className: 'custom-icon', html: '<i class="fa fa-fl
 
 // Fetch coordinates of a location string
 async function fetchCoordinates(location) {
-    sessionStorage.clear(); // Clear sessionStorage for new search
     // Check if location is in sessionStorage
     const cachedLocation = sessionStorage.getItem(location);
     if (cachedLocation) {
