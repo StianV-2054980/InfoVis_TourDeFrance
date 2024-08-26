@@ -9,6 +9,33 @@ var csvFilePathStages = baseURL + '/data/tdf_stages.csv';
 // From https://www.kaggle.com/datasets/pablomonleon/tour-de-france-historic-stages-data
 var csvFilePathStageResults = baseURL + '/data/stage_data.csv';
 
+let fullstageResultsList = [];
+
+// Event listeners for the modal
+document.getElementById('riderResultSearch').addEventListener('input', function() {
+    filterResults();
+});
+
+// document.getElementById('teamResultSearch').addEventListener('input', function() {
+//     filterResults();
+// });
+
+// Filter results
+function filterResults() {
+    const search = document.getElementById('riderResultSearch').value.toLowerCase();
+    //const teams = getTeams();
+    const stageResultsList = document.getElementById('resultsList');
+    const filteredResults = fullstageResultsList.filter(result => result.rider.toLowerCase().includes(search));
+
+    stageResultsList.innerHTML = '';
+    if (filteredResults.length > 0) {
+        populateResultsList(filteredResults, stageResultsList);
+        document.getElementById('emptyState').style.display = 'none';
+    } else {
+        document.getElementById('emptyState').style.display = 'block';
+    }
+}
+
 // Function to fetch and parce CSV
 async function fetchAndParseCSV(csvFilePath) {
     const response = await fetch(csvFilePath);
@@ -62,11 +89,16 @@ function populateResultsList(fullstageResults, stageResultsList) {
         resultItem.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
         fullItem = resultItem.appendChild(document.createElement('div'));
         fullItem.classList.add('ms-2', 'me-auto');
-        riderItem = fullItem.appendChild(document.createElement('div'));
+
+        const positionItem = fullItem.appendChild(document.createElement('div'));
+        positionItem.classList.add('fw-bold');
+        positionItem.textContent = `${result.rank}.`;
+
+        const riderItem = fullItem.appendChild(document.createElement('div'));
         riderItem.classList.add('fw-bold');
         riderItem.textContent = result.rider;
         
-        teamItem = fullItem.appendChild(document.createElement('div'));
+        const teamItem = fullItem.appendChild(document.createElement('div'));
         teamItem.classList.add('mt-1');
         teamItem.textContent = result.team;
 
@@ -87,6 +119,7 @@ function showResults(stage, stageResults, divItem) {
         
         // Get the results for the stage, by the id of the button that was pressed
         var fullstageResults = stageResults.filter(row => row.stage_results_id == this.id);
+        fullstageResultsList = fullstageResults;
         // Populate the modal list
         stageResultsList.innerHTML = '';
         populateResultsList(fullstageResults, stageResultsList);

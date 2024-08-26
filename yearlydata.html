@@ -118,19 +118,27 @@
     <!-- Modal -->
     <div class="modal fade" id="resultsModal" tabindex="-1" aria-labelledby="resultsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="resultsModalLabel">Full Stage Results</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="resultsModalLabel">Full Stage Results</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row pb-4 border-bottom">
+                        <div class="col-md-12">
+                            <input type="text" id="riderResultSearch" class="form-control" placeholder="Search for rider" /> 
+                        </div>
+                    </div>
+                    <ol id="resultsList" class="list-group list-group mt-4">
+                    </ol>
+                    <div id="emptyState" class="text-center mt-3" style="display: none;">
+                        No results for given filters. Try changing them.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
             </div>
-            <div class="modal-body">
-            <ol id="resultsList" class="list-group list-group-numbered">
-            </ol>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
