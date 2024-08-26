@@ -130,6 +130,11 @@ function generateTeamFilter(fullstageResults) {
     const teams = [...new Set(fullstageResults.map(result => result.team))];
     teams.sort();
 
+    if (teams.length === 1 && teams[0] === '') {
+        teamFilter.style.display = 'none';
+        return;
+    }
+
     teams.forEach(team => {
         const formCheck = document.createElement('div');
         formCheck.classList.add('form-check');
