@@ -36,6 +36,11 @@ function resetRider(riderNbr) {
     document.getElementById(`rider${riderNbr}Highest`).innerText = '';
     document.getElementById(`rider${riderNbr}Yearly`).innerHTML = '';
 
+    // Reset the color
+    document.getElementById(`rider${riderNbr}Overall`).classList.remove('table-success');
+    document.getElementById(`rider${riderNbr}Stages`).classList.remove('table-success');
+    document.getElementById(`rider${riderNbr}Highest`).classList.remove('table-success');
+
     if (riderNbr === 1) {
         rider1Name = '';
         rider1Data = [];
@@ -182,10 +187,9 @@ function createUpdatePositionChart(elementId, rider1 = [], rider2 = [], startYea
 // Function to display information in the table
 function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, highestOverall, yearlyPositions, stageWinYears) {
     document.getElementById(`rider${riderNumber}Name`).innerText = cleanedRider;
-    document.getElementById(`rider${riderNumber}Overall`).innerText = overallWins;  
+    document.getElementById(`rider${riderNumber}Overall`).innerText = overallWins;
     document.getElementById(`rider${riderNumber}Stages`).innerText = stageWins;
     document.getElementById(`rider${riderNumber}Highest`).innerText = highestOverall == Infinity ? 'DNF' : highestOverall;
-    console.log(stageWinYears);
 
     const yearRankMap = new Map();
     yearlyPositions.forEach(row => {
@@ -200,8 +204,67 @@ function displayInformation(riderNumber, cleanedRider, overallWins, stageWins, h
         .sort((a, b) => a[0] - b[0])
         .map(([year, rank]) => `Year: ${year}, Rank: ${rank}`)
         .join('<br>');
-        
+
     document.getElementById(`rider${riderNumber}Yearly`).innerHTML = combinedResults;
+
+    highlightBestStats();
+}
+
+// Function to highlight the best overall
+function highlightBestOverall(rider1Overall, rider2Overall) {
+    if (rider1Overall > rider2Overall) {
+        console.log('rider1Overall', rider1Overall);
+        document.getElementById('rider1Overall').classList.add('table-success');
+        document.getElementById('rider2Overall').classList.remove('table-success');
+    } else if (rider2Overall > rider1Overall) {
+        document.getElementById('rider2Overall').classList.add('table-success');
+        document.getElementById('rider1Overall').classList.remove('table-success');
+    } else {
+        document.getElementById('rider1Overall').classList.remove('table-success');
+        document.getElementById('rider2Overall').classList.remove('table-success');
+    }
+}
+
+// Function to highlight the best stages
+function highlightBestStages(rider1Stages, rider2Stages) {
+    if (rider1Stages > rider2Stages) {
+        document.getElementById('rider1Stages').classList.add('table-success');
+        document.getElementById('rider2Stages').classList.remove('table-success');
+    } else if (rider2Stages > rider1Stages) {
+        document.getElementById('rider2Stages').classList.add('table-success');
+        document.getElementById('rider1Stages').classList.remove('table-success');
+    } else {
+        document.getElementById('rider1Stages').classList.remove('table-success');
+        document.getElementById('rider2Stages').classList.remove('table-success');
+    }
+}
+
+// Function to highlight the best highest position
+function highlightHighest(rider1Highest, rider2Highest) {
+    if (rider1Highest < rider2Highest) {
+        document.getElementById('rider1Highest').classList.add('table-success');
+        document.getElementById('rider2Highest').classList.remove('table-success');
+    } else if (rider2Highest < rider1Highest) {
+        document.getElementById('rider2Highest').classList.add('table-success');
+        document.getElementById('rider1Highest').classList.remove('table-success');
+    } else {
+        document.getElementById('rider1Highest').classList.remove('table-success');
+        document.getElementById('rider2Highest').classList.remove('table-success');
+    }
+}
+
+// Function to highlight the best stats
+function highlightBestStats() {
+    const rider1Overall = parseInt(document.getElementById('rider1Overall').innerText);
+    const rider2Overall = parseInt(document.getElementById('rider2Overall').innerText);
+    const rider1Stages = parseInt(document.getElementById('rider1Stages').innerText);
+    const rider2Stages = parseInt(document.getElementById('rider2Stages').innerText);
+    const rider1Highest = document.getElementById('rider1Highest').innerText === 'DNF' || document.getElementById('rider1Highest').innerText === 'DSQ' ? Infinity : parseInt(document.getElementById('rider1Highest').innerText);
+    const rider2Highest = document.getElementById('rider2Highest').innerText === 'DNF' || document.getElementById('rider2Highest').innerText === 'DSQ' ? Infinity : parseInt(document.getElementById('rider2Highest').innerText);
+
+    highlightBestOverall(rider1Overall, rider2Overall);
+    highlightBestStages(rider1Stages, rider2Stages);
+    highlightHighest(rider1Highest, rider2Highest);
 }
 
 // Function to update the chart information
