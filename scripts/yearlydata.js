@@ -16,16 +16,32 @@ document.getElementById('riderResultSearch').addEventListener('input', function(
     filterResults();
 });
 
-// document.getElementById('teamResultSearch').addEventListener('input', function() {
-//     filterResults();
-// });
+document.getElementById('teamFilters').addEventListener('change', function() {
+    filterResults();
+});
+
+// Get teams
+function getTeams() {
+    const checkboxes = document.querySelectorAll('#teamFilters input[type="checkbox"]');
+    const teams = [];
+    checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+            teams.push(checkbox.value);
+        }
+    });
+    return teams;
+}
 
 // Filter results
 function filterResults() {
     const search = document.getElementById('riderResultSearch').value.toLowerCase();
-    //const teams = getTeams();
+    const teams = getTeams();
     const stageResultsList = document.getElementById('resultsList');
-    const filteredResults = fullstageResultsList.filter(result => result.rider.toLowerCase().includes(search));
+    const filteredResults = fullstageResultsList.filter(result => {
+        const riderMatches = result.rider.toLowerCase().includes(search);
+        const teamMatches = teams.length === 0 || teams.includes(result.team);
+        return riderMatches && teamMatches;
+    });
 
     stageResultsList.innerHTML = '';
     if (filteredResults.length > 0) {
@@ -106,6 +122,34 @@ function populateResultsList(fullstageResults, stageResultsList) {
     }
 }
 
+// Generate team filter
+function generateTeamFilter(fullstageResults) {
+    const teamFilter = document.getElementById('teamFilters');
+    teamFilter.innerHTML = '';
+
+    const teams = [...new Set(fullstageResults.map(result => result.team))];
+
+    teams.forEach(team => {
+        const formCheck = document.createElement('div');
+        formCheck.classList.add('form-check');
+
+        const checkbox = document.createElement('input');
+        checkbox.classList.add('form-check-input');
+        checkbox.type = 'checkbox';
+        checkbox.value = team;
+        checkbox.id = `team-${team}`;
+
+        const label = document.createElement('label');
+        label.classList.add('form-check-label');
+        label.htmlFor = `team-${team}`;
+        label.textContent = team;
+
+        formCheck.appendChild(checkbox);
+        formCheck.appendChild(label);
+        teamFilters.appendChild(formCheck);
+    });
+}
+
 // Show results
 function showResults(stage, stageResults, divItem) {
     resultsItem = divItem.appendChild(document.createElement('button'));
@@ -123,6 +167,8 @@ function showResults(stage, stageResults, divItem) {
         // Populate the modal list
         stageResultsList.innerHTML = '';
         populateResultsList(fullstageResults, stageResultsList);
+
+        generateTeamFilter(fullstageResults);
 
         // Show the modal
         const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
