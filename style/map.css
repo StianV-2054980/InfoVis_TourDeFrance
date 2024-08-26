@@ -14,25 +14,26 @@
 
 .custom-icon i {
     font-size: 24px;
-    /* Add a border */
     border: 1px solid #000;
+    border-radius: 50%;
     background-color: white;
-    padding: 5px;
+    padding: 2px;
 }
 
 .stage-number {
-    background-color: yellow; /* Change background color to make it more visible */
+    background-color: yellow;
     border-radius: 50%;
-    padding: 10px; /* Increase padding */
+    padding: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 40px; /* Increase width */
-    height: 40px; /* Increase height */
-    font-size: 20px; /* Increase font size */
+    width: 25px;
+    height: 25px;
+    font-size: 1.05rem;
     font-weight: bold;
     color: black;
-    border: 2px solid black; /* Add border for better visibility */
+    border: 2px solid black;
+    z-index: 1001;
 }
 
 .scrollable {

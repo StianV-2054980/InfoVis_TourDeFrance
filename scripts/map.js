@@ -145,6 +145,9 @@ async function updateMap(year, stagesData) {
                 if (coords) {
                     coordinates.push([coords[0].lat, coords[0].lon]);
                     L.marker([coords[0].lat, coords[0].lon], { icon: startIcon }).addTo(map).bindPopup(`${stage.Course} Start/Finish stage ${i + 1}`);
+
+                    const stageNumberIcon = L.divIcon({ className: '', html: `<div class='stage-number'>${i + 1}</div>` });
+                    L.marker([coords[0].lat + 0.01, coords[0].lon + 0.01], { icon: stageNumberIcon }).addTo(map);
                 }
             }
             if (courseParts.length === 2) {
@@ -156,6 +159,10 @@ async function updateMap(year, stagesData) {
                     L.marker(startCoords, { icon: startIcon }).addTo(map).bindPopup(`${courseParts[0]}: Start stage ${i + 1}`);
                     L.marker(finishCoords, { icon: finishIcon }).addTo(map).bindPopup(`${courseParts[1]}: Finish stage ${i + 1}`);
                     L.polyline([startCoords, finishCoords], { color: 'blue' }).addTo(map).bindPopup(`${stage.Course}: Route stage ${i + 1}`);
+
+                    const midPoint = [(startCoords[0] + finishCoords[0]) / 2, (startCoords[1] + finishCoords[1]) / 2];
+                    const stageNumberIcon = L.divIcon({ className: '', html: `<div class='stage-number'>${i + 1}</div>` });
+                    L.marker([midPoint[0] + 0.0001, midPoint[1] + 0.0001], { icon: stageNumberIcon }).addTo(map);
                 }
             }
         }
