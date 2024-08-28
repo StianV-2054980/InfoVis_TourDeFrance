@@ -261,7 +261,15 @@ async function initPage() {
     const yearSelector = document.getElementById('yearSelector');
     const prevYearButton = document.getElementById('prevYear');
     const nextYearButton = document.getElementById('nextYear');
-    let currentYear = 2022; // Last year in the dataset
+
+    // Init currentYear to sessionStorage if available
+    let currentYear;
+    if (sessionStorage.getItem('year')) {
+        currentYear = parseInt(sessionStorage.getItem('year'));
+    } else {
+        currentYear = 2022; // Last year in the dataset
+    }
+
     const minYear = 1903; // First year in the dataset
     const maxYear = 2022; // Last year in the dataset
 
@@ -275,19 +283,23 @@ async function initPage() {
             yearSelector.appendChild(option);
         }
     }
-
+    
     // Set initial year
+    yearSelector.value = currentYear;
     await updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
 
     // Disable button by default
-    nextYearButton.disabled = true;
+    if(currentYear === minYear) prevYearButton.disabled = true;
+    if(currentYear === maxYear) nextYearButton.disabled = true;
 
     // Add event listeners
     yearSelector.addEventListener('change', function() {
         currentYear = parseInt(this.value);
+        yearSelector.value = currentYear;
         updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
         nextYearButton.disabled = currentYear === maxYear;
         prevYearButton.disabled = currentYear === minYear;
+        sessionStorage.setItem('year', currentYear);
     });
 
     prevYearButton.addEventListener('click', function() {
@@ -299,6 +311,7 @@ async function initPage() {
             }
             yearSelector.value = currentYear;
             updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
+            sessionStorage.setItem('year', currentYear);
         }
         nextYearButton.disabled = false;
         prevYearButton.disabled = currentYear === minYear;
@@ -313,6 +326,7 @@ async function initPage() {
             }
             yearSelector.value = currentYear;
             updateInfo(currentYear, tourData, winnerData, stagesData, stageResultsData);
+            sessionStorage.setItem('year', currentYear);
         }
         prevYearButton.disabled = false;
         nextYearButton.disabled = currentYear === maxYear;
