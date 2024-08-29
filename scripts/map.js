@@ -40,6 +40,12 @@ async function fetchCoordinates(location) {
         importance: parseFloat(location.importance)
     }));
 
+    if (coordinates.length === 0) {
+        // return center of France if location not found
+        console.error(`Location ${location} not found`);
+        return [{name: 'France', lat: 46.603354, lon: 1.8883345, importance: 0}];
+    }
+
     // Store in sessionStorage
     sessionStorage.setItem(location, JSON.stringify(coordinates));
     return coordinates;
