@@ -224,7 +224,7 @@ function createUpdateStageWinsChart(elementId, rider1Stages = {}, rider2Stages =
         polar: {
             radialaxis: {
                 visible: true,
-                range: [0, maxStageWins],
+                range: [0, maxStageWins + 1],
                 tickvals: Array.from({length: maxStageWins + 1}, (_, i) => i),
             }
         },
