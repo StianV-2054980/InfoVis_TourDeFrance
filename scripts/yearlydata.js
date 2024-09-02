@@ -134,6 +134,9 @@ function generateTeamFilter(fullstageResults) {
         teamFilter.style.display = 'none';
         return;
     }
+    else {
+        teamFilter.style.display = 'block';
+    }
 
     teams.forEach(team => {
         const formCheck = document.createElement('div');
