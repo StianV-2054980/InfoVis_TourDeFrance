@@ -241,7 +241,7 @@ function createUpdateStageWinsChart(elementId, rider1Stages = {}, rider2Stages =
 // Function to fetch the rider image
 async function fetchRiderImage(rider) {
     const riderName = rider.replace(/\[.*?\]/g, '').replace(/\(.*?\)/g, '').trim().toLowerCase().replace(/\s+/g, '-').replace('č', 'c').replace('š', 's').replace('ž', 'z');
-    const pcsUrl = `https://corsproxy.io/?https://www.procyclingstats.com/rider/${riderName}`;
+    const pcsUrl = `https://corsproxy.io/?url=https://www.procyclingstats.com/rider/${riderName}`;
 
     try {
         const response = await fetch(pcsUrl);
